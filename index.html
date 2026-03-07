@@ -22,6 +22,10 @@
             --warm-light: #e8d5a8;
             --warm-glow: rgba(201, 169, 110, 0.08);
             --red-soft: #d4736c;
+            --base-a: #4ecdc4;
+            --base-t: #ff6b6b;
+            --base-g: #c9a96e;
+            --base-c: #a8e6cf;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -88,6 +92,17 @@
             margin: 32px auto;
         }
 
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            border: 0;
+        }
+
         /* ═══════════════════════════════════════════════
            PRELOADER
            ═══════════════════════════════════════════════ */
@@ -97,8 +112,10 @@
             z-index: 1000;
             background: var(--black);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            gap: 24px;
             transition: opacity 0.8s ease, visibility 0.8s ease;
         }
 
@@ -114,8 +131,73 @@
             letter-spacing: 0.02em;
         }
 
+        .preloader-dna {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .preloader-dna span {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            opacity: 0;
+            animation: preloaderBase 1.2s ease forwards;
+        }
+
+        @keyframes preloaderBase {
+            to { opacity: 0.6; }
+        }
+
         /* ═══════════════════════════════════════════════
-           HERO
+           PROGRESS BAR
+           ═══════════════════════════════════════════════ */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: var(--warm);
+            z-index: 100;
+            width: 0%;
+        }
+
+        /* ═══════════════════════════════════════════════
+           GENOME TICKER
+           ═══════════════════════════════════════════════ */
+        .genome-ticker {
+            position: fixed;
+            top: 2px;
+            left: 0;
+            right: 0;
+            height: 16px;
+            overflow: hidden;
+            z-index: 99;
+            opacity: 0.35;
+            pointer-events: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 8px;
+            letter-spacing: 3px;
+            line-height: 16px;
+            white-space: nowrap;
+        }
+
+        .genome-ticker-track {
+            display: inline-block;
+            animation: tickerScroll 120s linear infinite;
+        }
+
+        .genome-ticker .ba { color: var(--base-a); }
+        .genome-ticker .bt { color: var(--base-t); }
+        .genome-ticker .bg { color: var(--base-g); }
+        .genome-ticker .bc { color: var(--base-c); }
+
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ═══════════════════════════════════════════════
+           HERO + DNA CANVAS
            ═══════════════════════════════════════════════ */
         .hero {
             min-height: 100vh;
@@ -124,6 +206,21 @@
             justify-content: center;
             align-items: center;
             position: relative;
+            overflow: hidden;
+        }
+
+        #dnaCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
         }
 
         .hero-name {
@@ -136,9 +233,7 @@
             animation: heroReveal 1.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
         }
 
-        .hero-period {
-            color: var(--warm);
-        }
+        .hero-period { color: var(--warm); }
 
         .hero-sub {
             font-family: 'DM Sans', sans-serif;
@@ -149,6 +244,17 @@
             letter-spacing: 0.04em;
             opacity: 0;
             animation: heroReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 1.2s forwards;
+        }
+
+        .hero-tagline {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--warm);
+            margin-top: 16px;
+            opacity: 0;
+            animation: heroReveal 1.2s ease 1.6s forwards;
         }
 
         .scroll-indicator {
@@ -162,6 +268,7 @@
             gap: 12px;
             opacity: 0;
             animation: heroReveal 1s ease 2.2s forwards;
+            z-index: 1;
         }
 
         .scroll-indicator .label {
@@ -202,12 +309,27 @@
         /* ═══════════════════════════════════════════════
            SPACER
            ═══════════════════════════════════════════════ */
-        .spacer {
-            height: 30vh;
+        .spacer { height: 30vh; }
+        .spacer-sm { height: 15vh; }
+
+        /* ═══════════════════════════════════════════════
+           FLOATING MATH SYMBOLS
+           ═══════════════════════════════════════════════ */
+        .math-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
         }
 
-        .spacer-sm {
-            height: 15vh;
+        .math-symbol {
+            position: absolute;
+            font-family: 'Space Mono', monospace;
+            color: rgba(201, 169, 110, 0.04);
+            font-size: 2rem;
+            user-select: none;
+            will-change: transform;
         }
 
         /* ═══════════════════════════════════════════════
@@ -246,34 +368,25 @@
             text-transform: lowercase;
         }
 
-        .route-line {
+        .route-container {
             width: 100%;
             max-width: 600px;
-            height: 80px;
-            margin: 48px auto;
+            height: 120px;
+            margin: 48px auto 0;
             position: relative;
         }
 
-        .route-line svg {
+        .route-container svg {
             width: 100%;
             height: 100%;
-        }
-
-        .route-path {
-            stroke-dasharray: 800;
-            stroke-dashoffset: 800;
-            transition: stroke-dashoffset 2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .route-line.visible .route-path {
-            stroke-dashoffset: 0;
+            overflow: visible;
         }
 
         .route-labels {
             display: flex;
             justify-content: space-between;
             max-width: 600px;
-            margin: 0 auto;
+            margin: 12px auto 0;
         }
 
         .route-label {
@@ -285,194 +398,6 @@
 
         .route-label.origin { color: var(--warm); }
         .route-label.dest { color: var(--white); }
-
-        /* ═══════════════════════════════════════════════
-           BIG NUMBERS — THE WORKLOAD
-           ═══════════════════════════════════════════════ */
-        .big-number-section {
-            text-align: center;
-            padding: 0 24px;
-        }
-
-        .big-number {
-            font-family: 'Instrument Serif', serif;
-            font-size: clamp(7rem, 22vw, 20rem);
-            line-height: 0.85;
-            letter-spacing: -0.05em;
-            color: var(--white);
-            position: relative;
-        }
-
-        .big-number .counter {
-            display: inline-block;
-        }
-
-        .big-number-label {
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 300;
-            font-size: clamp(1rem, 2vw, 1.4rem);
-            color: var(--gray-light);
-            margin-top: 16px;
-            letter-spacing: 0.04em;
-        }
-
-        .big-number-context {
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 300;
-            font-size: clamp(0.85rem, 1.3vw, 1rem);
-            color: var(--gray);
-            max-width: 400px;
-            margin: 20px auto 0;
-            line-height: 1.7;
-        }
-
-        /* GPA Section */
-        .gpa-number {
-            color: var(--warm);
-        }
-
-        /* ═══════════════════════════════════════════════
-           WHAT SHE STUDIES
-           ═══════════════════════════════════════════════ */
-        .studies-section {
-            padding: 120px 24px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .studies-header {
-            text-align: center;
-            margin-bottom: 80px;
-        }
-
-        .studies-title {
-            font-family: 'Instrument Serif', serif;
-            font-size: clamp(2.2rem, 5vw, 3.8rem);
-            font-weight: 400;
-            line-height: 1.2;
-            letter-spacing: -0.02em;
-        }
-
-        .studies-title em {
-            font-style: italic;
-            color: var(--warm);
-        }
-
-        .subject-list {
-            list-style: none;
-        }
-
-        .subject-item {
-            display: flex;
-            align-items: baseline;
-            gap: 24px;
-            padding: 36px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            cursor: default;
-            transition: all 0.4s ease;
-        }
-
-        .subject-item:first-child {
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .subject-item:hover {
-            padding-left: 12px;
-        }
-
-        .subject-item:hover .subject-name {
-            color: var(--warm);
-        }
-
-        .subject-num {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.7rem;
-            color: var(--gray);
-            min-width: 30px;
-        }
-
-        .subject-name {
-            font-family: 'Instrument Serif', serif;
-            font-size: clamp(1.6rem, 3.5vw, 2.6rem);
-            font-weight: 400;
-            letter-spacing: -0.01em;
-            transition: color 0.4s ease;
-        }
-
-        .subject-desc {
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 300;
-            font-size: 0.9rem;
-            color: var(--gray);
-            margin-left: auto;
-            text-align: right;
-            max-width: 250px;
-        }
-
-        @media (max-width: 640px) {
-            .subject-desc { display: none; }
-        }
-
-        /* ═══════════════════════════════════════════════
-           BOBA
-           ═══════════════════════════════════════════════ */
-        .boba-section {
-            text-align: center;
-            padding: 120px 24px;
-            position: relative;
-        }
-
-        .boba-icon {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 40px;
-            position: relative;
-        }
-
-        .boba-cup {
-            width: 100%;
-            height: 100%;
-        }
-
-        .boba-text {
-            font-family: 'Instrument Serif', serif;
-            font-style: italic;
-            font-size: clamp(1.5rem, 3.5vw, 2.5rem);
-            color: var(--off-white);
-            max-width: 500px;
-            margin: 0 auto;
-            line-height: 1.5;
-        }
-
-        .boba-aside {
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 300;
-            font-size: 0.9rem;
-            color: var(--gray);
-            margin-top: 20px;
-        }
-
-        .boba-pearls {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .pearl {
-            position: absolute;
-            border-radius: 50%;
-            background: var(--warm);
-            opacity: 0;
-            animation: floatPearl var(--duration, 6s) ease-in-out var(--delay, 0s) infinite;
-        }
-
-        @keyframes floatPearl {
-            0% { opacity: 0; transform: translateY(20px) scale(0.8); }
-            20% { opacity: 0.15; }
-            80% { opacity: 0.15; }
-            100% { opacity: 0; transform: translateY(-60px) scale(0.6); }
-        }
 
         /* ═══════════════════════════════════════════════
            QUOTE / BRIDGE
@@ -498,7 +423,329 @@
         }
 
         /* ═══════════════════════════════════════════════
-           FINALE
+           NEURON NETWORK — SUBJECTS
+           ═══════════════════════════════════════════════ */
+        .neuron-section {
+            padding: 120px 24px;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .studies-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .studies-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .studies-title em {
+            font-style: italic;
+            color: var(--warm);
+        }
+
+        .neuron-canvas-wrap {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            margin: 0 auto;
+        }
+
+        #neuronCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .neuron-tooltip {
+            position: absolute;
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid rgba(201, 169, 110, 0.3);
+            padding: 14px 18px;
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.25s;
+            z-index: 10;
+            max-width: 200px;
+        }
+
+        .neuron-tooltip h4 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.1rem;
+            color: var(--warm);
+            margin-bottom: 6px;
+        }
+
+        .neuron-tooltip p {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: 0.8rem;
+            color: var(--gray-light);
+            line-height: 1.5;
+        }
+
+        /* ═══════════════════════════════════════════════
+           CELL DIVISION — WORKLOAD
+           ═══════════════════════════════════════════════ */
+        .cell-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 60px 24px;
+            text-align: center;
+        }
+
+        .cell-canvas-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            margin: 30px auto;
+        }
+
+        #cellCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .big-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(5rem, 16vw, 14rem);
+            line-height: 0.85;
+            letter-spacing: -0.05em;
+            color: var(--white);
+            position: relative;
+        }
+
+        .big-number-label {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            color: var(--gray-light);
+            margin-top: 16px;
+            letter-spacing: 0.04em;
+        }
+
+        .big-number-context {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(0.85rem, 1.3vw, 1rem);
+            color: var(--gray);
+            max-width: 400px;
+            margin: 20px auto 0;
+            line-height: 1.7;
+        }
+
+        /* ═══════════════════════════════════════════════
+           GPA — FUNCTION PLOT
+           ═══════════════════════════════════════════════ */
+        .gpa-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 60px 24px;
+            text-align: center;
+        }
+
+        .gpa-canvas-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            height: 400px;
+            margin: 30px auto;
+        }
+
+        #gpaCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .gpa-number { color: var(--warm); }
+
+        .gpa-big-reveal {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(5rem, 16vw, 14rem);
+            color: var(--warm);
+            letter-spacing: -0.05em;
+            line-height: 0.85;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .gpa-big-reveal.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .math-notation {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .equation {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--warm);
+            opacity: 0.6;
+            letter-spacing: 1px;
+        }
+
+        /* ═══════════════════════════════════════════════
+           GOLDEN SPIRAL — FUTURE
+           ═══════════════════════════════════════════════ */
+        .spiral-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 80px 24px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .spiral-canvas-wrap {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        #spiralCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .spiral-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .spiral-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 400;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .spiral-sub {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            color: var(--gray-light);
+            margin-top: 20px;
+            letter-spacing: 0.02em;
+        }
+
+        .spiral-sub .highlight {
+            color: var(--warm);
+            font-weight: 400;
+        }
+
+        .spiral-context {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(0.85rem, 1.3vw, 1rem);
+            color: var(--gray);
+            max-width: 450px;
+            margin: 24px auto 0;
+            line-height: 1.7;
+        }
+
+        /* ═══════════════════════════════════════════════
+           BOBA — MOLECULAR
+           ═══════════════════════════════════════════════ */
+        .boba-section {
+            text-align: center;
+            padding: 120px 24px;
+            position: relative;
+        }
+
+        .boba-pearls {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .pearl {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--warm);
+            opacity: 0;
+            animation: floatPearl var(--duration, 6s) ease-in-out var(--delay, 0s) infinite;
+        }
+
+        @keyframes floatPearl {
+            0% { opacity: 0; transform: translateY(20px) scale(0.8); }
+            20% { opacity: 0.15; }
+            80% { opacity: 0.15; }
+            100% { opacity: 0; transform: translateY(-60px) scale(0.6); }
+        }
+
+        .boba-icon {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .boba-cup { width: 100%; height: 100%; }
+
+        .boba-cup .boba-pearl-interactive {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .boba-text {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+            color: var(--off-white);
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .boba-formula {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--gray-dark);
+            margin-top: 16px;
+            letter-spacing: 1px;
+        }
+
+        .boba-aside {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 8px;
+        }
+
+        /* ═══════════════════════════════════════════════
+           FINALE — SYNAPSE LIGHTNING
            ═══════════════════════════════════════════════ */
         .finale {
             min-height: 100vh;
@@ -512,6 +759,43 @@
             overflow: hidden;
         }
 
+        #synapseCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .finale-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .synapse-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+            margin: 24px 0 40px;
+        }
+
+        .synapse-stat {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--warm);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .synapse-stat.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         .finale-declaration {
             font-family: 'Instrument Serif', serif;
             font-size: clamp(3rem, 9vw, 8rem);
@@ -519,24 +803,6 @@
             letter-spacing: -0.03em;
             line-height: 1;
             position: relative;
-        }
-
-        .finale-heart {
-            display: inline-block;
-            color: var(--red-soft);
-            font-size: 0.65em;
-            animation: heartbeat 1.6s ease-in-out infinite;
-            vertical-align: middle;
-            margin-left: 8px;
-            filter: drop-shadow(0 0 30px rgba(212, 115, 108, 0.3));
-        }
-
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            14% { transform: scale(1.15); }
-            28% { transform: scale(1); }
-            42% { transform: scale(1.1); }
-            56% { transform: scale(1); }
         }
 
         .finale-sub {
@@ -557,30 +823,17 @@
             color: var(--warm);
         }
 
-        /* Fireflies for the finale */
-        #finaleParticles {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-        }
-
-        .firefly {
-            position: absolute;
-            width: 3px;
-            height: 3px;
+        /* ═══════════════════════════════════════════════
+           CURSOR TRAIL
+           ═══════════════════════════════════════════════ */
+        .cursor-dot {
+            position: fixed;
             border-radius: 50%;
             background: var(--warm);
-            box-shadow: 0 0 8px var(--warm), 0 0 20px rgba(201, 169, 110, 0.3);
-            animation: fireflyFloat var(--duration) ease-in-out infinite;
-            opacity: 0;
-        }
-
-        @keyframes fireflyFloat {
-            0% { opacity: 0; transform: translate(0, 0); }
-            25% { opacity: var(--max-opacity, 0.6); }
-            50% { transform: translate(var(--dx), var(--dy)); }
-            75% { opacity: var(--max-opacity, 0.6); }
-            100% { opacity: 0; transform: translate(0, 0); }
+            pointer-events: none;
+            z-index: 9998;
+            box-shadow: 0 0 6px rgba(201, 169, 110, 0.4);
+            mix-blend-mode: screen;
         }
 
         /* ═══════════════════════════════════════════════
@@ -601,20 +854,6 @@
         }
 
         /* ═══════════════════════════════════════════════
-           PROGRESS BAR
-           ═══════════════════════════════════════════════ */
-        .progress-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 1px;
-            background: var(--warm);
-            z-index: 100;
-            width: 0%;
-            transition: width 0.1s linear;
-        }
-
-        /* ═══════════════════════════════════════════════
            GRAIN OVERLAY
            ═══════════════════════════════════════════════ */
         .grain {
@@ -627,7 +866,29 @@
             background-repeat: repeat;
             background-size: 256px 256px;
         }
+
+        /* ═══════════════════════════════════════════════
+           MOBILE
+           ═══════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .neuron-canvas-wrap { height: 380px; }
+            .cell-canvas-wrap { height: 280px; }
+            .gpa-canvas-wrap { height: 300px; }
+            .genome-ticker { display: none; }
+            .cursor-dot { display: none; }
+            .math-symbol:nth-child(n+8) { display: none; }
+            .synapse-stats { gap: 16px; }
+            .math-notation { gap: 20px; }
+        }
+
+        @media (max-width: 480px) {
+            .neuron-canvas-wrap { height: 320px; }
+            .cell-canvas-wrap { height: 240px; }
+            .gpa-canvas-wrap { height: 250px; }
+        }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/ScrollTrigger.min.js"></script>
 </head>
 <body>
 
@@ -637,15 +898,28 @@
 <!-- Progress bar -->
 <div class="progress-bar" id="progressBar"></div>
 
-<!-- Preloader -->
-<div id="preloader">
-    <span class="preloader-text">A story worth telling</span>
+<!-- Genome ticker -->
+<div class="genome-ticker" id="genomeTicker">
+    <div class="genome-ticker-track" id="genomeTrack"></div>
 </div>
 
-<!-- ═══════════ HERO ═══════════ -->
-<section class="hero">
-    <h1 class="hero-name">Katie<span class="hero-period">.</span></h1>
-    <p class="hero-sub">A story of distance, dedication, and extraordinary brilliance</p>
+<!-- Floating math symbols -->
+<div class="math-bg" id="mathBg" aria-hidden="true"></div>
+
+<!-- Preloader -->
+<div id="preloader">
+    <span class="preloader-text">A story told in code</span>
+    <div class="preloader-dna" id="preloaderDna"></div>
+</div>
+
+<!-- ═══════════ HERO — DNA HELIX ═══════════ -->
+<section class="hero" id="heroSection">
+    <canvas id="dnaCanvas"></canvas>
+    <div class="hero-content">
+        <h1 class="hero-name">Katie<span class="hero-period">.</span></h1>
+        <p class="hero-sub">A story of distance, dedication, and extraordinary brilliance</p>
+        <p class="hero-tagline">Biology · Neuroscience · Mathematics</p>
+    </div>
     <div class="scroll-indicator">
         <span class="label">Scroll</span>
         <div class="scroll-line"></div>
@@ -655,20 +929,30 @@
 <!-- ═══════════ CHAPTER 1: THE DISTANCE ═══════════ -->
 <div class="spacer"></div>
 
-<section class="screen distance-section">
+<section class="screen distance-section" id="distanceSection">
     <p class="distance-context fade-element">She left everything she knew.</p>
     <div class="distance-context fade-element delay-1" style="margin-top: 12px;">
         Packed her life into suitcases, said goodbye to her family, and boarded a flight that would carry her
     </div>
-    <div class="distance-number fade-element delay-2">
-        <span class="counter" data-target="9146" data-duration="2000">0</span>
+    <div class="distance-number">
+        <span id="distanceCounter">0</span>
     </div>
     <div class="distance-unit fade-element delay-3">miles from home</div>
-    <div class="route-line fade-element delay-3">
-        <svg viewBox="0 0 600 80" fill="none" preserveAspectRatio="none">
-            <path class="route-path" d="M 30 60 Q 150 -10 300 40 Q 450 90 570 20" stroke="rgba(201,169,110,0.4)" stroke-width="1" fill="none"/>
-            <circle cx="30" cy="60" r="4" fill="#c9a96e" opacity="0.8"/>
-            <circle cx="570" cy="20" r="4" fill="#ffffff" opacity="0.8"/>
+    <div class="route-container" id="routeContainer">
+        <svg id="routeSvg" viewBox="0 0 600 100" fill="none" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="4" result="blur"/>
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+            </defs>
+            <path id="flightPathBg" d="M 40 70 C 140 10, 300 5, 400 45 C 480 75, 540 35, 565 25"
+                  stroke="rgba(201,169,110,0.1)" stroke-width="1" fill="none" stroke-dasharray="4 6"/>
+            <path id="flightPathDrawn" d="M 40 70 C 140 10, 300 5, 400 45 C 480 75, 540 35, 565 25"
+                  stroke="rgba(201,169,110,0.5)" stroke-width="1.5" fill="none"/>
+            <circle cx="40" cy="70" r="4" fill="#c9a96e" opacity="0.8"/>
+            <circle cx="565" cy="25" r="4" fill="#ffffff" opacity="0"/>
+            <circle id="flightDot" r="5" fill="#c9a96e" filter="url(#glow)" cx="40" cy="70"/>
         </svg>
     </div>
     <div class="route-labels fade-element delay-4">
@@ -689,15 +973,43 @@
 
 <div class="spacer-sm"></div>
 
-<!-- ═══════════ CHAPTER 2: THE WORKLOAD ═══════════ -->
-<section class="screen big-number-section">
+<!-- ═══════════ NEURON NETWORK — SUBJECTS ═══════════ -->
+<section class="neuron-section" id="neuronSection">
+    <div class="studies-header">
+        <span class="label fade-element">What she studies</span>
+        <div class="divider fade-element delay-1"></div>
+        <h2 class="studies-title fade-element delay-2">Her neural network<br>of <em>knowledge</em></h2>
+    </div>
+    <div class="neuron-canvas-wrap" id="neuronWrap">
+        <canvas id="neuronCanvas"></canvas>
+        <div class="neuron-tooltip" id="neuronTooltip">
+            <h4 id="tooltipTitle"></h4>
+            <p id="tooltipDesc"></p>
+        </div>
+    </div>
+    <!-- Accessible fallback -->
+    <ul class="sr-only">
+        <li>Mathematics — The language of the universe</li>
+        <li>Biology — The science of life itself</li>
+        <li>Chemistry — The architecture of matter</li>
+        <li>Developmental Psychology — The map of the human mind</li>
+        <li>Spanish — Her third language</li>
+        <li>English 112 — Writing &amp; research</li>
+    </ul>
+</section>
+
+<div class="spacer-sm"></div>
+
+<!-- ═══════════ CELL DIVISION — WORKLOAD ═══════════ -->
+<section class="cell-section" id="cellSection">
     <span class="label fade-element">This semester alone</span>
     <div class="divider fade-element delay-1"></div>
-    <div class="big-number fade-element delay-2">
-        <span class="counter" data-target="22" data-duration="1200">0</span>
+    <div class="cell-canvas-wrap">
+        <canvas id="cellCanvas"></canvas>
     </div>
-    <div class="big-number-label fade-element delay-3">credit hours</div>
-    <div class="big-number-context fade-element delay-4">
+    <div class="big-number" id="cellNumber">1</div>
+    <div class="big-number-label">credit hours</div>
+    <div class="big-number-context fade-element delay-2">
         The average student takes 15. The ambitious take 18.<br>
         Katie takes 22 — and makes it look effortless.
     </div>
@@ -705,122 +1017,112 @@
 
 <div class="spacer"></div>
 
-<!-- ═══════════ CHAPTER 3: THE GPA ═══════════ -->
-<section class="screen big-number-section">
+<!-- ═══════════ GPA — FUNCTION PLOT ═══════════ -->
+<section class="gpa-section" id="gpaSection">
     <span class="label fade-element">And her grade point average?</span>
     <div class="divider fade-element delay-1"></div>
-    <div class="big-number gpa-number fade-element delay-2">
-        <span class="counter" data-target="4.0" data-duration="1500" data-decimals="1">0</span>
+    <div class="gpa-canvas-wrap">
+        <canvas id="gpaCanvas"></canvas>
     </div>
-    <div class="big-number-label fade-element delay-3">perfect</div>
-    <div class="big-number-context fade-element delay-4">
+    <div class="gpa-big-reveal" id="gpaReveal">4.0</div>
+    <div class="big-number-label fade-element delay-2">perfect</div>
+    <div class="big-number-context fade-element delay-3">
         Not a 3.9. Not a 3.95.<br>
         A 4.0. Flawless. Under 22 credits of pressure.
+    </div>
+    <div class="math-notation fade-element delay-4">
+        <span class="equation">f(x) = 4.0</span>
+        <span class="equation">f'(x) &gt; 0</span>
+        <span class="equation">lim f(x) = perfection</span>
     </div>
 </section>
 
 <div class="spacer"></div>
 
-<!-- ═══════════ BRIDGE ═══════════ -->
-<section class="screen quote-section">
-    <span class="label fade-element">Wake Tech Community College</span>
-    <div class="divider fade-element delay-1"></div>
-    <p class="quote-text fade-element delay-2">
-        A top student, preparing to transfer to<br>
-        <span class="em">the University of North Carolina at Chapel Hill</span>.
-    </p>
-</section>
-
-<div class="spacer-sm"></div>
-
-<!-- ═══════════ CHAPTER 4: WHAT SHE STUDIES ═══════════ -->
-<section class="studies-section">
-    <div class="studies-header">
-        <span class="label fade-element">What she studies</span>
-        <div class="divider fade-element delay-1"></div>
-        <h2 class="studies-title fade-element delay-2">She doesn't pick the<br><em>easy</em> subjects.</h2>
+<!-- ═══════════ GOLDEN SPIRAL — FUTURE ═══════════ -->
+<section class="spiral-section" id="spiralSection">
+    <div class="spiral-canvas-wrap">
+        <canvas id="spiralCanvas"></canvas>
     </div>
-    <ul class="subject-list">
-        <li class="subject-item fade-element">
-            <span class="subject-num">01</span>
-            <span class="subject-name">Mathematics</span>
-            <span class="subject-desc">The language of the universe</span>
-        </li>
-        <li class="subject-item fade-element">
-            <span class="subject-num">02</span>
-            <span class="subject-name">Biology</span>
-            <span class="subject-desc">The science of life itself</span>
-        </li>
-        <li class="subject-item fade-element">
-            <span class="subject-num">03</span>
-            <span class="subject-name">Chemistry</span>
-            <span class="subject-desc">The architecture of matter</span>
-        </li>
-        <li class="subject-item fade-element">
-            <span class="subject-num">04</span>
-            <span class="subject-name">Developmental Psychology</span>
-            <span class="subject-desc">The map of the human mind</span>
-        </li>
-        <li class="subject-item fade-element">
-            <span class="subject-num">05</span>
-            <span class="subject-name">Spanish</span>
-            <span class="subject-desc">Her third language</span>
-        </li>
-        <li class="subject-item fade-element">
-            <span class="subject-num">06</span>
-            <span class="subject-name">English 112</span>
-            <span class="subject-desc">Writing & research</span>
-        </li>
-    </ul>
+    <div class="spiral-content">
+        <span class="label fade-element">Where she's heading</span>
+        <div class="divider fade-element delay-1"></div>
+        <h2 class="spiral-title fade-element delay-2">UNC Chapel Hill</h2>
+        <p class="spiral-sub fade-element delay-3">
+            Double major: <span class="highlight">Biology &amp; Neuroscience</span>
+        </p>
+        <p class="spiral-context fade-element delay-4">
+            Where math meets life, and curiosity meets purpose.<br>
+            The golden ratio — nature's own perfection — guides her path.
+        </p>
+    </div>
 </section>
 
 <div class="spacer-sm"></div>
 
-<!-- ═══════════ BOBA ═══════════ -->
-<section class="boba-section">
+<!-- ═══════════ BOBA — MOLECULAR ═══════════ -->
+<section class="boba-section" id="bobaSection">
     <div class="boba-pearls" id="bobaParticles"></div>
     <div class="boba-icon fade-element">
-        <svg class="boba-cup" viewBox="0 0 120 120" fill="none">
-            <!-- Cup -->
-            <rect x="32" y="24" width="56" height="72" rx="8" fill="none" stroke="rgba(201,169,110,0.4)" stroke-width="1.5"/>
-            <!-- Dome lid -->
-            <path d="M 32 36 Q 60 16 88 36" stroke="rgba(201,169,110,0.4)" stroke-width="1.5" fill="none"/>
-            <!-- Straw -->
-            <line x1="65" y1="8" x2="58" y2="55" stroke="rgba(201,169,110,0.6)" stroke-width="2.5" stroke-linecap="round"/>
-            <!-- Pearls -->
-            <circle cx="45" cy="82" r="4" fill="rgba(201,169,110,0.2)" stroke="rgba(201,169,110,0.4)" stroke-width="0.8"/>
-            <circle cx="56" cy="86" r="4" fill="rgba(201,169,110,0.2)" stroke="rgba(201,169,110,0.4)" stroke-width="0.8"/>
-            <circle cx="67" cy="82" r="4" fill="rgba(201,169,110,0.2)" stroke="rgba(201,169,110,0.4)" stroke-width="0.8"/>
-            <circle cx="50" cy="78" r="3.5" fill="rgba(201,169,110,0.15)" stroke="rgba(201,169,110,0.3)" stroke-width="0.8"/>
-            <circle cx="62" cy="76" r="3.5" fill="rgba(201,169,110,0.15)" stroke="rgba(201,169,110,0.3)" stroke-width="0.8"/>
-            <circle cx="75" cy="80" r="3" fill="rgba(201,169,110,0.12)" stroke="rgba(201,169,110,0.25)" stroke-width="0.8"/>
-            <!-- Tea fill -->
-            <rect x="34" y="50" width="52" height="44" rx="6" fill="rgba(201,169,110,0.06)"/>
+        <svg class="boba-cup" viewBox="0 0 160 180" fill="none">
+            <!-- Hexagonal molecular cup body -->
+            <polygon points="55,40 105,40 120,80 120,140 105,160 55,160 40,140 40,80"
+                     fill="none" stroke="rgba(201,169,110,0.25)" stroke-width="1"/>
+            <!-- Internal hex rings (benzene style) -->
+            <polygon points="65,85 85,75 105,85 105,105 85,115 65,105"
+                     fill="rgba(201,169,110,0.04)" stroke="rgba(201,169,110,0.15)" stroke-width="0.8"/>
+            <polygon points="65,105 85,95 105,105 105,125 85,135 65,125"
+                     fill="rgba(201,169,110,0.03)" stroke="rgba(201,169,110,0.12)" stroke-width="0.8"/>
+            <!-- Dome lid arc -->
+            <path d="M 55 40 Q 80 15 105 40" stroke="rgba(201,169,110,0.3)" stroke-width="1.2" fill="none"/>
+            <!-- Straw as bond -->
+            <line x1="88" y1="8" x2="78" y2="75" stroke="rgba(201,169,110,0.5)" stroke-width="2" stroke-linecap="round"/>
+            <!-- Atom vertices on cup structure -->
+            <circle cx="55" cy="40" r="2.5" fill="rgba(201,169,110,0.3)"/>
+            <circle cx="105" cy="40" r="2.5" fill="rgba(201,169,110,0.3)"/>
+            <circle cx="120" cy="80" r="2.5" fill="rgba(201,169,110,0.3)"/>
+            <circle cx="120" cy="140" r="2.5" fill="rgba(201,169,110,0.3)"/>
+            <circle cx="40" cy="80" r="2.5" fill="rgba(201,169,110,0.3)"/>
+            <circle cx="40" cy="140" r="2.5" fill="rgba(201,169,110,0.3)"/>
+            <!-- Boba pearls as atoms with electron shells -->
+            <circle class="boba-pearl-interactive" cx="65" cy="145" r="7" fill="rgba(201,169,110,0.15)" stroke="rgba(201,169,110,0.4)" stroke-width="1"/>
+            <circle class="boba-pearl-interactive" cx="80" cy="150" r="7" fill="rgba(201,169,110,0.15)" stroke="rgba(201,169,110,0.4)" stroke-width="1"/>
+            <circle class="boba-pearl-interactive" cx="95" cy="145" r="7" fill="rgba(201,169,110,0.15)" stroke="rgba(201,169,110,0.4)" stroke-width="1"/>
+            <circle class="boba-pearl-interactive" cx="72" cy="138" r="5.5" fill="rgba(201,169,110,0.1)" stroke="rgba(201,169,110,0.3)" stroke-width="0.8"/>
+            <circle class="boba-pearl-interactive" cx="88" cy="138" r="5.5" fill="rgba(201,169,110,0.1)" stroke="rgba(201,169,110,0.3)" stroke-width="0.8"/>
+            <!-- Electron orbits on two pearls -->
+            <ellipse cx="65" cy="145" rx="11" ry="5" fill="none" stroke="rgba(201,169,110,0.12)" stroke-width="0.5" transform="rotate(-30 65 145)"/>
+            <ellipse cx="95" cy="145" rx="11" ry="5" fill="none" stroke="rgba(201,169,110,0.12)" stroke-width="0.5" transform="rotate(30 95 145)"/>
         </svg>
     </div>
     <p class="boba-text fade-element delay-1">
         And after conquering all of that?<br>She just wants boba.
     </p>
-    <p class="boba-aside fade-element delay-2">Honestly, she's earned it.</p>
+    <p class="boba-formula fade-element delay-2">C₁₂H₂₂O₁₁ · H₂O · C₈H₁₀N₄O₂</p>
+    <p class="boba-aside fade-element delay-3">Sugar, water, and caffeine. She's earned it.</p>
 </section>
 
 <div class="spacer"></div>
 
-<!-- ═══════════ FINALE ═══════════ -->
-<section class="finale" id="finale">
-    <div id="finaleParticles"></div>
-    <div style="position: relative; z-index: 2;">
+<!-- ═══════════ FINALE — SYNAPSE LIGHTNING ═══════════ -->
+<section class="finale" id="finaleSection">
+    <canvas id="synapseCanvas"></canvas>
+    <div class="finale-content">
         <span class="label fade-element">The conclusion</span>
         <div class="divider fade-element delay-1"></div>
-        <h2 class="finale-declaration fade-element delay-2">
-            Extraordinary.
-        </h2>
+        <div class="synapse-stats" id="synapseStats">
+            <span class="synapse-stat" data-index="0">9,146 miles</span>
+            <span class="synapse-stat" data-index="1">22 credits</span>
+            <span class="synapse-stat" data-index="2">4.0 GPA</span>
+            <span class="synapse-stat" data-index="3">6 subjects</span>
+        </div>
+        <h2 class="finale-declaration fade-element delay-2">Extraordinary.</h2>
         <p class="finale-sub fade-element delay-3">
-            9,146 miles. 22 credits. A 4.0 GPA. Six challenging subjects.
+            9,146 miles. 22 credits. A 4.0 GPA. Six challenging subjects.<br>
             A story of discipline, brilliance, and unstoppable ambition.
         </p>
         <p class="finale-sub fade-element delay-4" style="margin-top: 16px; color: var(--warm-light);">
-            On her way to the University of North Carolina at Chapel Hill.
+            Biology &amp; Neuroscience at the University of North Carolina at Chapel Hill.
         </p>
     </div>
 </section>
@@ -831,120 +1133,1123 @@
 </div>
 
 <script>
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// GLOBALS & SETUP
+// ═══════════════════════════════════════════════════════
+gsap.registerPlugin(ScrollTrigger);
+const dpr = Math.min(window.devicePixelRatio || 1, 2);
+let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+
+function setupCanvas(canvas) {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    return { ctx, w: rect.width, h: rect.height };
+}
+
+document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+
+// ═══════════════════════════════════════════════════════
 // PRELOADER
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+(function() {
+    const bases = 'ATGCGATCAATGCGTACGATCG';
+    const colors = { A: '#4ecdc4', T: '#ff6b6b', G: '#c9a96e', C: '#a8e6cf' };
+    const container = document.getElementById('preloaderDna');
+    bases.split('').forEach((b, i) => {
+        const span = document.createElement('span');
+        span.textContent = b;
+        span.style.color = colors[b];
+        span.style.animationDelay = (i * 0.04) + 's';
+        container.appendChild(span);
+    });
+})();
+
 window.addEventListener('load', () => {
     setTimeout(() => {
         document.getElementById('preloader').classList.add('hidden');
-    }, 1200);
+        ScrollTrigger.refresh();
+    }, 1400);
 });
 
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 // PROGRESS BAR
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 window.addEventListener('scroll', () => {
-    const scrollTop = window.scrollY;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = (scrollTop / docHeight) * 100;
+    const progress = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
     document.getElementById('progressBar').style.width = progress + '%';
 });
 
-// ═══════════════════════════════════════════
-// SCROLL REVEAL
-// ═══════════════════════════════════════════
-const observer = new IntersectionObserver((entries) => {
+// ═══════════════════════════════════════════════════════
+// SCROLL REVEAL (IntersectionObserver for fade-elements)
+// ═══════════════════════════════════════════════════════
+const fadeObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+}, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
 
-            // Trigger counter animation if present
-            const counter = entry.target.querySelector('.counter');
-            if (counter && !counter.dataset.animated) {
-                animateCounter(counter);
-                counter.dataset.animated = 'true';
+document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el));
+
+// ═══════════════════════════════════════════════════════
+// GENOME TICKER
+// ═══════════════════════════════════════════════════════
+(function() {
+    const track = document.getElementById('genomeTrack');
+    const bases = 'ATGC';
+    const classMap = { A: 'ba', T: 'bt', G: 'bg', C: 'bc' };
+    // Encode KATIE: AAA(K) GCU(A) ACU(T) AUU(I) GAA(E) then random padding
+    const message = 'AAAGCUACUAUUGAA';
+    let seq = '';
+    for (let i = 0; i < 600; i++) {
+        if (i >= 50 && i < 50 + message.length) {
+            seq += message[i - 50] === 'U' ? 'T' : message[i - 50];
+        } else {
+            seq += bases[Math.floor(Math.random() * 4)];
+        }
+    }
+    // Double for seamless loop
+    const fullSeq = seq + seq;
+    let html = '';
+    for (const ch of fullSeq) {
+        const b = ch === 'U' ? 'T' : ch;
+        html += `<span class="${classMap[b] || 'bg'}">${b}</span>`;
+    }
+    track.innerHTML = html;
+})();
+
+// ═══════════════════════════════════════════════════════
+// FLOATING MATH SYMBOLS
+// ═══════════════════════════════════════════════════════
+(function() {
+    const symbols = ['∫', 'Σ', '∂', 'Δ', 'π', 'φ', '∞', '√', 'λ', 'θ', 'α', 'β', 'Ω', '∇', 'ε'];
+    const container = document.getElementById('mathBg');
+    const count = window.innerWidth < 768 ? 7 : 15;
+    for (let i = 0; i < count; i++) {
+        const span = document.createElement('span');
+        span.className = 'math-symbol';
+        span.textContent = symbols[i % symbols.length];
+        span.style.left = (5 + Math.random() * 90) + '%';
+        span.style.top = (Math.random() * 300) + 'vh';
+        span.style.fontSize = (1.2 + Math.random() * 2) + 'rem';
+        span.dataset.speed = (0.02 + Math.random() * 0.06).toFixed(3);
+        container.appendChild(span);
+    }
+
+    const mathSymbols = container.querySelectorAll('.math-symbol');
+    window.addEventListener('scroll', () => {
+        const sy = window.scrollY;
+        mathSymbols.forEach(s => {
+            const speed = parseFloat(s.dataset.speed);
+            s.style.transform = `translateY(${-sy * speed}px)`;
+        });
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// CURSOR TRAIL (desktop only)
+// ═══════════════════════════════════════════════════════
+(function() {
+    if (!window.matchMedia('(hover: hover)').matches) return;
+    const particles = [];
+    const MAX = 12;
+    let lastX = 0, lastY = 0;
+
+    document.addEventListener('mousemove', e => {
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        if (Math.abs(dx) + Math.abs(dy) < 8) return;
+        lastX = e.clientX;
+        lastY = e.clientY;
+
+        const dot = document.createElement('div');
+        dot.className = 'cursor-dot';
+        const size = 2 + Math.random() * 3;
+        dot.style.width = size + 'px';
+        dot.style.height = size + 'px';
+        dot.style.left = e.clientX + 'px';
+        dot.style.top = e.clientY + 'px';
+        dot.style.opacity = '0.6';
+        dot.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+        document.body.appendChild(dot);
+
+        requestAnimationFrame(() => {
+            dot.style.opacity = '0';
+            dot.style.transform = `translate(${(Math.random()-0.5)*20}px, ${(Math.random()-0.5)*20}px) scale(0)`;
+        });
+
+        particles.push(dot);
+        if (particles.length > MAX) {
+            const old = particles.shift();
+            if (old.parentElement) old.remove();
+        }
+
+        setTimeout(() => { if (dot.parentElement) dot.remove(); }, 600);
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 1. DNA HELIX — HERO CANVAS
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('dnaCanvas');
+    let ctx, w, h;
+    let isActive = true;
+    let time = 0;
+
+    function resize() {
+        const r = setupCanvas(canvas);
+        ctx = r.ctx; w = r.w; h = r.h;
+    }
+
+    function render() {
+        if (!isActive) return;
+        requestAnimationFrame(render);
+        time++;
+        ctx.clearRect(0, 0, w, h);
+
+        const centerX = w / 2;
+        const centerY = h / 2;
+        const amplitude = Math.min(w * 0.15, 120);
+        const helixH = h * 0.75;
+        const nPairs = 40;
+        const rotSpeed = 0.015;
+
+        // Mouse parallax
+        const mx = ((mouseX / w) - 0.5) * 30;
+        const my = ((mouseY / h) - 0.5) * 15;
+
+        // Collect pairs with z-depth for sorting
+        const pairs = [];
+        for (let i = 0; i < nPairs; i++) {
+            const t = i / nPairs;
+            const y = centerY - helixH / 2 + t * helixH + my;
+            const angle = t * Math.PI * 6 + time * rotSpeed;
+            const z1 = Math.cos(angle);
+            const z2 = Math.cos(angle + Math.PI);
+            const x1 = centerX + Math.sin(angle) * amplitude + mx;
+            const x2 = centerX + Math.sin(angle + Math.PI) * amplitude + mx;
+            pairs.push({ y, x1, x2, z1, z2, t, angle });
+        }
+
+        // Draw back strand connections first (z < 0)
+        pairs.forEach(p => {
+            const minZ = Math.min(p.z1, p.z2);
+            if (minZ < 0.3) {
+                // Base pair line
+                ctx.beginPath();
+                ctx.moveTo(p.x1, p.y);
+                ctx.lineTo(p.x2, p.y);
+                ctx.strokeStyle = `rgba(201, 169, 110, ${0.04 + Math.max(0, minZ) * 0.08})`;
+                ctx.lineWidth = 0.8;
+                ctx.stroke();
             }
+        });
 
-            // Trigger route line
-            if (entry.target.classList.contains('route-line')) {
-                // Already handled by CSS via .visible
+        // Draw front base pair lines
+        pairs.forEach(p => {
+            const minZ = Math.min(p.z1, p.z2);
+            if (minZ >= 0.3) {
+                ctx.beginPath();
+                ctx.moveTo(p.x1, p.y);
+                ctx.lineTo(p.x2, p.y);
+                ctx.strokeStyle = `rgba(201, 169, 110, ${0.06 + minZ * 0.15})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        });
+
+        // Draw backbone curves (two strands)
+        for (let strand = 0; strand < 2; strand++) {
+            ctx.beginPath();
+            for (let i = 0; i < nPairs; i++) {
+                const t = i / nPairs;
+                const y = centerY - helixH / 2 + t * helixH + my;
+                const angle = t * Math.PI * 6 + time * rotSpeed + (strand * Math.PI);
+                const x = centerX + Math.sin(angle) * amplitude + mx;
+                const z = Math.cos(angle);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = 'rgba(201, 169, 110, 0.12)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        }
+
+        // Draw nucleotide dots
+        pairs.forEach(p => {
+            [{ x: p.x1, z: p.z1 }, { x: p.x2, z: p.z2 }].forEach(dot => {
+                const r = 1.5 + (dot.z + 1) * 1.5;
+                const alpha = 0.15 + (dot.z + 1) * 0.25;
+                ctx.beginPath();
+                ctx.arc(dot.x, p.y, r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(201, 169, 110, ${alpha})`;
+                ctx.fill();
+
+                // Glow on front-facing dots
+                if (dot.z > 0.5) {
+                    ctx.beginPath();
+                    ctx.arc(dot.x, p.y, r + 3, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(201, 169, 110, ${(dot.z - 0.5) * 0.1})`;
+                    ctx.fill();
+                }
+            });
+        });
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    render();
+
+    // Fade hero on scroll
+    ScrollTrigger.create({
+        trigger: '#heroSection',
+        start: 'top top',
+        end: 'bottom top',
+        onLeave: () => { isActive = false; },
+        onEnterBack: () => { isActive = true; render(); }
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 2. DISTANCE — SCROLL-SCRUBBED FLIGHT PATH
+// ═══════════════════════════════════════════════════════
+(function() {
+    const path = document.getElementById('flightPathDrawn');
+    const dot = document.getElementById('flightDot');
+    const destDot = document.querySelector('#routeSvg circle:nth-of-type(2)');
+    const counter = document.getElementById('distanceCounter');
+
+    const pathLength = path.getTotalLength();
+    path.style.strokeDasharray = pathLength;
+    path.style.strokeDashoffset = pathLength;
+
+    gsap.to(path, {
+        strokeDashoffset: 0,
+        ease: 'none',
+        scrollTrigger: {
+            trigger: '#distanceSection',
+            start: 'top 80%',
+            end: 'bottom 30%',
+            scrub: 1,
+            onUpdate: (self) => {
+                const p = self.progress;
+                const point = path.getPointAtLength(p * pathLength);
+                dot.setAttribute('cx', point.x);
+                dot.setAttribute('cy', point.y);
+                counter.textContent = Math.round(p * 9146).toLocaleString();
+                destDot.setAttribute('opacity', p > 0.9 ? ((p - 0.9) * 10) : 0);
             }
         }
     });
-}, {
-    threshold: 0.15,
-    rootMargin: '0px 0px -60px 0px'
-});
+})();
 
-document.querySelectorAll('.fade-element').forEach(el => observer.observe(el));
-document.querySelectorAll('.route-line').forEach(el => observer.observe(el));
+// ═══════════════════════════════════════════════════════
+// 3. NEURON NETWORK — SUBJECTS
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('neuronCanvas');
+    const wrap = document.getElementById('neuronWrap');
+    const tooltip = document.getElementById('neuronTooltip');
+    const tooltipTitle = document.getElementById('tooltipTitle');
+    const tooltipDesc = document.getElementById('tooltipDesc');
+    let ctx, w, h;
+    let isActive = false;
+    let time = 0;
+    let hoveredNode = null;
 
-// ═══════════════════════════════════════════
-// ANIMATED COUNTERS
-// ═══════════════════════════════════════════
-function animateCounter(el) {
-    const target = parseFloat(el.dataset.target);
-    const duration = parseInt(el.dataset.duration) || 1500;
-    const decimals = parseInt(el.dataset.decimals) || 0;
-    const start = performance.now();
-    const format = (n) => {
-        if (decimals > 0) return n.toFixed(decimals);
-        return Math.round(n).toLocaleString();
-    };
+    const subjects = [
+        { id: 'katie', label: 'Katie', x: 0.5, y: 0.48, r: 22, color: '#c9a96e', desc: 'The central hub — connecting everything' },
+        { id: 'math', label: 'Mathematics', x: 0.18, y: 0.22, r: 16, color: '#c9a96e', desc: 'The language of the universe' },
+        { id: 'bio', label: 'Biology', x: 0.82, y: 0.18, r: 16, color: '#4ecdc4', desc: 'The science of life itself' },
+        { id: 'chem', label: 'Chemistry', x: 0.15, y: 0.72, r: 15, color: '#ff6b6b', desc: 'The architecture of matter' },
+        { id: 'psych', label: 'Dev Psychology', x: 0.85, y: 0.75, r: 15, color: '#a8e6cf', desc: 'The map of the human mind' },
+        { id: 'spanish', label: 'Spanish', x: 0.35, y: 0.85, r: 13, color: '#e8d5a8', desc: 'Her third language' },
+        { id: 'english', label: 'English 112', x: 0.65, y: 0.88, r: 13, color: '#d4736c', desc: 'Writing & research' },
+    ];
 
-    function update(now) {
-        const elapsed = now - start;
-        const progress = Math.min(elapsed / duration, 1);
+    const connections = [
+        ['katie', 'math'], ['katie', 'bio'], ['katie', 'chem'],
+        ['katie', 'psych'], ['katie', 'spanish'], ['katie', 'english'],
+        ['math', 'bio'], ['math', 'chem'], ['bio', 'chem'],
+        ['bio', 'psych'], ['chem', 'bio'],
+    ];
 
-        // Ease out expo
-        const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-        const current = eased * target;
+    const pulses = [];
+    let pulseTimer = 0;
 
-        el.textContent = format(current);
+    function getNode(id) { return subjects.find(s => s.id === id); }
+    function nodePos(node) { return { x: node.x * w, y: node.y * h }; }
 
-        if (progress < 1) {
-            requestAnimationFrame(update);
+    function spawnPulse() {
+        const conn = connections[Math.floor(Math.random() * connections.length)];
+        const from = getNode(conn[0]);
+        const to = getNode(conn[1]);
+        if (Math.random() > 0.5) {
+            pulses.push({ from: to, to: from, progress: 0, speed: 0.008 + Math.random() * 0.008 });
+        } else {
+            pulses.push({ from, to, progress: 0, speed: 0.008 + Math.random() * 0.008 });
         }
     }
 
-    requestAnimationFrame(update);
-}
+    function resize() {
+        const r = setupCanvas(canvas);
+        ctx = r.ctx; w = r.w; h = r.h;
+    }
 
-// ═══════════════════════════════════════════
-// BOBA PEARLS (floating particles)
-// ═══════════════════════════════════════════
-const bobaContainer = document.getElementById('bobaParticles');
-for (let i = 0; i < 12; i++) {
-    const pearl = document.createElement('div');
-    pearl.classList.add('pearl');
-    const size = Math.random() * 6 + 3;
-    pearl.style.width = size + 'px';
-    pearl.style.height = size + 'px';
-    pearl.style.left = (20 + Math.random() * 60) + '%';
-    pearl.style.top = (30 + Math.random() * 50) + '%';
-    pearl.style.setProperty('--duration', (4 + Math.random() * 4) + 's');
-    pearl.style.setProperty('--delay', (Math.random() * 3) + 's');
-    bobaContainer.appendChild(pearl);
-}
+    function render() {
+        if (!isActive) return;
+        requestAnimationFrame(render);
+        time++;
 
-// ═══════════════════════════════════════════
-// FINALE FIREFLIES
-// ═══════════════════════════════════════════
-const finaleContainer = document.getElementById('finaleParticles');
-for (let i = 0; i < 30; i++) {
-    const firefly = document.createElement('div');
-    firefly.classList.add('firefly');
-    firefly.style.left = Math.random() * 100 + '%';
-    firefly.style.top = Math.random() * 100 + '%';
-    const dx = (Math.random() - 0.5) * 120 + 'px';
-    const dy = (Math.random() - 0.5) * 120 + 'px';
-    firefly.style.setProperty('--dx', dx);
-    firefly.style.setProperty('--dy', dy);
-    firefly.style.setProperty('--duration', (5 + Math.random() * 8) + 's');
-    firefly.style.setProperty('--max-opacity', (0.3 + Math.random() * 0.4).toFixed(2));
-    firefly.style.animationDelay = (Math.random() * 8) + 's';
-    finaleContainer.appendChild(firefly);
-}
+        ctx.clearRect(0, 0, w, h);
+
+        // Draw connections
+        connections.forEach(([aId, bId]) => {
+            const a = nodePos(getNode(aId));
+            const b = nodePos(getNode(bId));
+            const isHovered = hoveredNode && (hoveredNode.id === aId || hoveredNode.id === bId);
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.strokeStyle = isHovered
+                ? 'rgba(201, 169, 110, 0.35)'
+                : 'rgba(201, 169, 110, 0.08)';
+            ctx.lineWidth = isHovered ? 1.5 : 0.8;
+            ctx.stroke();
+        });
+
+        // Update and draw pulses
+        pulseTimer++;
+        if (pulseTimer > 30 && pulses.length < 8) {
+            spawnPulse();
+            pulseTimer = 0;
+        }
+
+        for (let i = pulses.length - 1; i >= 0; i--) {
+            const p = pulses[i];
+            p.progress += p.speed;
+            if (p.progress > 1) {
+                pulses.splice(i, 1);
+                continue;
+            }
+            const a = nodePos(p.from);
+            const b = nodePos(p.to);
+            const px = a.x + (b.x - a.x) * p.progress;
+            const py = a.y + (b.y - a.y) * p.progress;
+            const alpha = Math.sin(p.progress * Math.PI) * 0.8;
+
+            ctx.beginPath();
+            ctx.arc(px, py, 3, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(201, 169, 110, ${alpha})`;
+            ctx.fill();
+
+            // Glow
+            ctx.beginPath();
+            ctx.arc(px, py, 8, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(201, 169, 110, ${alpha * 0.2})`;
+            ctx.fill();
+        }
+
+        // Draw nodes
+        subjects.forEach(node => {
+            const pos = nodePos(node);
+            const isHovered = hoveredNode && hoveredNode.id === node.id;
+            const isKatie = node.id === 'katie';
+            const pulse = isKatie ? 1 + Math.sin(time * 0.03) * 0.12 : 1;
+            const r = node.r * pulse;
+
+            // Outer glow
+            const glowR = r + (isHovered ? 15 : 8);
+            const grad = ctx.createRadialGradient(pos.x, pos.y, r * 0.5, pos.x, pos.y, glowR);
+            grad.addColorStop(0, node.color + (isHovered ? '40' : '15'));
+            grad.addColorStop(1, node.color + '00');
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, glowR, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Main circle
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
+            ctx.fillStyle = node.color + (isHovered ? '50' : '20');
+            ctx.strokeStyle = node.color + (isHovered ? 'cc' : '60');
+            ctx.lineWidth = isHovered ? 2 : 1;
+            ctx.fill();
+            ctx.stroke();
+
+            // Label
+            ctx.font = isKatie ? "500 11px 'DM Sans', sans-serif" : "400 9px 'Space Mono', monospace";
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = isHovered ? '#ffffff' : (node.color + 'cc');
+            ctx.fillText(isKatie ? 'KATIE' : node.label.toUpperCase(), pos.x, pos.y);
+        });
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Hover detection
+    canvas.addEventListener('mousemove', e => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        let found = null;
+
+        subjects.forEach(node => {
+            const pos = nodePos(node);
+            const dist = Math.hypot(mx - pos.x, my - pos.y);
+            if (dist < node.r + 10) found = node;
+        });
+
+        hoveredNode = found;
+        canvas.style.cursor = found ? 'pointer' : 'default';
+
+        if (found) {
+            tooltipTitle.textContent = found.label;
+            tooltipDesc.textContent = found.desc;
+            tooltip.style.opacity = '1';
+            tooltip.style.left = (nodePos(found).x + found.r + 15) + 'px';
+            tooltip.style.top = (nodePos(found).y - 20) + 'px';
+        } else {
+            tooltip.style.opacity = '0';
+        }
+    });
+
+    canvas.addEventListener('mouseleave', () => {
+        hoveredNode = null;
+        tooltip.style.opacity = '0';
+    });
+
+    // Touch support
+    canvas.addEventListener('touchstart', e => {
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const mx = touch.clientX - rect.left;
+        const my = touch.clientY - rect.top;
+        let found = null;
+        subjects.forEach(node => {
+            const pos = nodePos(node);
+            if (Math.hypot(mx - pos.x, my - pos.y) < node.r + 15) found = node;
+        });
+        hoveredNode = found;
+        if (found) {
+            tooltipTitle.textContent = found.label;
+            tooltipDesc.textContent = found.desc;
+            tooltip.style.opacity = '1';
+            tooltip.style.left = (nodePos(found).x + found.r + 15) + 'px';
+            tooltip.style.top = (nodePos(found).y - 20) + 'px';
+        } else {
+            tooltip.style.opacity = '0';
+        }
+    });
+
+    // ScrollTrigger: activate when in view
+    ScrollTrigger.create({
+        trigger: '#neuronSection',
+        start: 'top 80%',
+        end: 'bottom 20%',
+        onEnter: () => { isActive = true; render(); },
+        onLeave: () => { isActive = false; },
+        onEnterBack: () => { isActive = true; render(); },
+        onLeaveBack: () => { isActive = false; }
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 4. CELL DIVISION — WORKLOAD (SCROLL-SCRUBBED)
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('cellCanvas');
+    const cellNumber = document.getElementById('cellNumber');
+    let ctx, w, h;
+    let cellProgress = 0;
+    let isActive = false;
+
+    const cellColors = ['#c9a96e', '#4ecdc4', '#ff6b6b', '#a8e6cf', '#e8d5a8', '#d4736c'];
+
+    // Cell positions — we'll compute them based on count
+    function getCellPositions(count, w, h) {
+        const cells = [];
+        const cols = Math.ceil(Math.sqrt(count * (w / h)));
+        const rows = Math.ceil(count / cols);
+        const cellW = w / (cols + 1);
+        const cellH = h / (rows + 1);
+        for (let i = 0; i < count; i++) {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            cells.push({
+                x: cellW * (col + 1) + (Math.random() - 0.5) * cellW * 0.3,
+                y: cellH * (row + 1) + (Math.random() - 0.5) * cellH * 0.3,
+                rx: cellW * 0.3 + Math.random() * 5,
+                ry: cellH * 0.28 + Math.random() * 5,
+                color: cellColors[i % cellColors.length],
+                phase: Math.random() * Math.PI * 2
+            });
+        }
+        return cells;
+    }
+
+    function resize() {
+        const r = setupCanvas(canvas);
+        ctx = r.ctx; w = r.w; h = r.h;
+    }
+
+    function drawCell(x, y, rx, ry, color, time, divisionPhase) {
+        // divisionPhase: 0 = normal, 0-1 = dividing
+        ctx.save();
+        ctx.translate(x, y);
+
+        if (divisionPhase > 0 && divisionPhase < 1) {
+            // Stretching cell
+            const stretch = 1 + divisionPhase * 0.8;
+            const pinch = 1 - divisionPhase * 0.4;
+            ctx.scale(stretch, pinch);
+        }
+
+        // Cell membrane
+        const breathe = 1 + Math.sin(time * 0.02 + x) * 0.05;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx * breathe, ry * breathe, 0, 0, Math.PI * 2);
+        ctx.fillStyle = color + '15';
+        ctx.strokeStyle = color + '40';
+        ctx.lineWidth = 1;
+        ctx.fill();
+        ctx.stroke();
+
+        // Nucleus
+        ctx.beginPath();
+        ctx.arc(0, 0, Math.min(rx, ry) * 0.3, 0, Math.PI * 2);
+        ctx.fillStyle = color + '25';
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    let frame = 0;
+    function render() {
+        if (!isActive) return;
+        requestAnimationFrame(render);
+        frame++;
+        ctx.clearRect(0, 0, w, h);
+
+        // Map progress to cell count (exponential feeling)
+        let count;
+        if (cellProgress < 0.05) count = 1;
+        else if (cellProgress < 0.15) count = 2;
+        else if (cellProgress < 0.3) count = 4;
+        else if (cellProgress < 0.5) count = 8;
+        else if (cellProgress < 0.7) count = 12;
+        else if (cellProgress < 0.85) count = 16;
+        else if (cellProgress < 0.95) count = 20;
+        else count = 22;
+
+        cellNumber.textContent = count;
+
+        const cells = getCellPositions(count, w, h);
+        cells.forEach(cell => {
+            drawCell(cell.x, cell.y, cell.rx, cell.ry, cell.color, frame, 0);
+        });
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    ScrollTrigger.create({
+        trigger: '#cellSection',
+        start: 'top top',
+        end: '+=150%',
+        pin: true,
+        scrub: 1,
+        onUpdate: (self) => { cellProgress = self.progress; },
+        onEnter: () => { isActive = true; render(); },
+        onLeave: () => { isActive = false; },
+        onEnterBack: () => { isActive = true; render(); },
+        onLeaveBack: () => { isActive = false; }
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 5. GPA — FUNCTION PLOT (SCROLL-SCRUBBED)
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('gpaCanvas');
+    const reveal = document.getElementById('gpaReveal');
+    let ctx, w, h;
+    let plotProgress = 0;
+    let isActive = false;
+
+    function resize() {
+        const r = setupCanvas(canvas);
+        ctx = r.ctx; w = r.w; h = r.h;
+    }
+
+    // f(x) = 4 * (1 - e^(-3x))
+    function gpaFn(x) { return 4 * (1 - Math.exp(-3 * x)); }
+    // f'(x) = 12 * e^(-3x)
+    function gpaPrime(x) { return 12 * Math.exp(-3 * x); }
+
+    function render() {
+        if (!isActive) return;
+        requestAnimationFrame(render);
+        ctx.clearRect(0, 0, w, h);
+
+        const pad = { left: 60, right: 30, top: 30, bottom: 50 };
+        const gw = w - pad.left - pad.right;
+        const gh = h - pad.top - pad.bottom;
+
+        // Grid
+        ctx.strokeStyle = 'rgba(201, 169, 110, 0.06)';
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i <= 8; i++) {
+            const y = pad.top + (gh / 8) * i;
+            ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + gw, y); ctx.stroke();
+        }
+        for (let i = 0; i <= 10; i++) {
+            const x = pad.left + (gw / 10) * i;
+            ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + gh); ctx.stroke();
+        }
+
+        // Axes
+        ctx.strokeStyle = 'rgba(201, 169, 110, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad.left, pad.top); ctx.lineTo(pad.left, pad.top + gh); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(pad.left, pad.top + gh); ctx.lineTo(pad.left + gw, pad.top + gh); ctx.stroke();
+
+        // Y-axis labels
+        ctx.font = "10px 'Space Mono', monospace";
+        ctx.fillStyle = 'rgba(201, 169, 110, 0.4)';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        for (let v = 0; v <= 4; v++) {
+            const y = pad.top + gh - (v / 4.5) * gh;
+            ctx.fillText(v.toFixed(1), pad.left - 8, y);
+        }
+
+        // X-axis label
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText('time →', pad.left + gw / 2, pad.top + gh + 20);
+
+        // 4.0 perfection line (dashed)
+        const y40 = pad.top + gh - (4.0 / 4.5) * gh;
+        ctx.setLineDash([6, 4]);
+        ctx.strokeStyle = 'rgba(201, 169, 110, 0.25)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad.left, y40); ctx.lineTo(pad.left + gw, y40); ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Label the line
+        ctx.fillStyle = 'rgba(201, 169, 110, 0.3)';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('perfection', pad.left + gw - 60, y40 - 4);
+
+        // Draw main function curve up to plotProgress
+        const steps = Math.floor(plotProgress * 200);
+        if (steps > 1) {
+            // Main curve
+            ctx.beginPath();
+            for (let i = 0; i <= steps; i++) {
+                const t = i / 200;
+                const xVal = t * 2;
+                const yVal = gpaFn(xVal);
+                const px = pad.left + t * gw;
+                const py = pad.top + gh - (yVal / 4.5) * gh;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.strokeStyle = 'rgba(201, 169, 110, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Derivative curve (smaller, lighter)
+            ctx.beginPath();
+            for (let i = 0; i <= steps; i++) {
+                const t = i / 200;
+                const xVal = t * 2;
+                const yVal = gpaPrime(xVal) / 3; // Scale down
+                const px = pad.left + t * gw;
+                const py = pad.top + gh - (yVal / 4.5) * gh;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.strokeStyle = 'rgba(232, 213, 168, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Dot at end of main curve
+            const lastT = steps / 200;
+            const lastX = lastT * 2;
+            const lastY = gpaFn(lastX);
+            const dotPx = pad.left + lastT * gw;
+            const dotPy = pad.top + gh - (lastY / 4.5) * gh;
+            ctx.beginPath();
+            ctx.arc(dotPx, dotPy, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#c9a96e';
+            ctx.fill();
+
+            // Glow
+            ctx.beginPath();
+            ctx.arc(dotPx, dotPy, 10, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(201, 169, 110, 0.15)';
+            ctx.fill();
+
+            // f'(x) label
+            if (plotProgress > 0.3) {
+                ctx.font = "9px 'Space Mono', monospace";
+                ctx.fillStyle = 'rgba(232, 213, 168, 0.4)';
+                ctx.textAlign = 'left';
+                ctx.fillText("f'(x) — always positive", pad.left + gw * 0.55, pad.top + gh - 20);
+            }
+        }
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    ScrollTrigger.create({
+        trigger: '#gpaSection',
+        start: 'top top',
+        end: '+=150%',
+        pin: true,
+        scrub: 1,
+        onUpdate: (self) => {
+            plotProgress = self.progress;
+            if (self.progress > 0.85) {
+                reveal.classList.add('visible');
+            } else {
+                reveal.classList.remove('visible');
+            }
+        },
+        onEnter: () => { isActive = true; render(); },
+        onLeave: () => { isActive = false; },
+        onEnterBack: () => { isActive = true; render(); },
+        onLeaveBack: () => { isActive = false; }
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 6. GOLDEN SPIRAL — FUTURE
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('spiralCanvas');
+    let ctx, w, h;
+    let spiralProgress = 0;
+    let isActive = false;
+    let frame = 0;
+
+    function resize() {
+        const r = setupCanvas(canvas);
+        ctx = r.ctx; w = r.w; h = r.h;
+    }
+
+    function render() {
+        if (!isActive) return;
+        requestAnimationFrame(render);
+        frame++;
+        ctx.clearRect(0, 0, w, h);
+
+        const cx = w / 2;
+        const cy = h / 2;
+        const phi = (1 + Math.sqrt(5)) / 2;
+        const maxAngle = spiralProgress * Math.PI * 8;
+        const maxR = Math.min(w, h) * 0.42;
+
+        // Draw spiral
+        if (maxAngle > 0.1) {
+            ctx.beginPath();
+            const totalSteps = 500;
+            const drawSteps = Math.floor(spiralProgress * totalSteps);
+            for (let i = 0; i <= drawSteps; i++) {
+                const t = i / totalSteps;
+                const angle = t * Math.PI * 8;
+                const r = maxR * Math.pow(phi, (angle / (2 * Math.PI)) - 3);
+                const clampR = Math.min(r, maxR);
+                const x = cx + Math.cos(angle + frame * 0.002) * clampR;
+                const y = cy + Math.sin(angle + frame * 0.002) * clampR;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = 'rgba(201, 169, 110, 0.3)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Achievement dots along the spiral
+            const achievements = [0.1, 0.25, 0.4, 0.55, 0.7, 0.85];
+            achievements.forEach(at => {
+                if (spiralProgress > at) {
+                    const angle = at * Math.PI * 8;
+                    const r = maxR * Math.pow(phi, (angle / (2 * Math.PI)) - 3);
+                    const clampR = Math.min(r, maxR);
+                    const x = cx + Math.cos(angle + frame * 0.002) * clampR;
+                    const y = cy + Math.sin(angle + frame * 0.002) * clampR;
+                    const alpha = Math.min(1, (spiralProgress - at) * 5);
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(201, 169, 110, ${alpha * 0.6})`;
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, 8, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(201, 169, 110, ${alpha * 0.1})`;
+                    ctx.fill();
+                }
+            });
+        }
+
+        // Fibonacci rectangles (subtle, in background)
+        if (spiralProgress > 0.1) {
+            ctx.strokeStyle = 'rgba(201, 169, 110, 0.04)';
+            ctx.lineWidth = 0.5;
+            const fibs = [1, 1, 2, 3, 5, 8];
+            let scale = maxR * 0.03;
+            let ox = cx, oy = cy;
+            fibs.forEach((f, i) => {
+                if (spiralProgress > i * 0.15) {
+                    const size = f * scale;
+                    ctx.strokeRect(ox - size / 2, oy - size / 2, size, size);
+                }
+            });
+        }
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    ScrollTrigger.create({
+        trigger: '#spiralSection',
+        start: 'top 80%',
+        end: 'bottom 20%',
+        scrub: 1,
+        onUpdate: (self) => { spiralProgress = self.progress; },
+        onEnter: () => { isActive = true; render(); },
+        onLeave: () => { isActive = false; },
+        onEnterBack: () => { isActive = true; render(); },
+        onLeaveBack: () => { isActive = false; }
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 7. BOBA — FLOATING PEARLS + INTERACTIVE
+// ═══════════════════════════════════════════════════════
+(function() {
+    // Floating particles
+    const container = document.getElementById('bobaParticles');
+    for (let i = 0; i < 12; i++) {
+        const pearl = document.createElement('div');
+        pearl.classList.add('pearl');
+        const size = Math.random() * 6 + 3;
+        pearl.style.width = size + 'px';
+        pearl.style.height = size + 'px';
+        pearl.style.left = (20 + Math.random() * 60) + '%';
+        pearl.style.top = (30 + Math.random() * 50) + '%';
+        pearl.style.setProperty('--duration', (4 + Math.random() * 4) + 's');
+        pearl.style.setProperty('--delay', (Math.random() * 3) + 's');
+        container.appendChild(pearl);
+    }
+
+    // Interactive pearls - bounce on click
+    document.querySelectorAll('.boba-pearl-interactive').forEach(pearl => {
+        pearl.addEventListener('click', () => {
+            gsap.fromTo(pearl,
+                { attr: { r: parseFloat(pearl.getAttribute('r')) } },
+                {
+                    attr: { r: parseFloat(pearl.getAttribute('r')) * 1.5 },
+                    duration: 0.15,
+                    yoyo: true,
+                    repeat: 3,
+                    ease: 'elastic.out(1, 0.3)'
+                }
+            );
+        });
+
+        pearl.style.cursor = 'pointer';
+        pearl.style.pointerEvents = 'auto';
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 8. FINALE — SYNAPSE LIGHTNING
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('synapseCanvas');
+    let ctx, w, h;
+    let isActive = false;
+    let hasFired = false;
+    let time = 0;
+
+    const nodes = [];
+    const edges = [];
+    const nodeCount = 50;
+    let litNodes = new Set();
+    let litEdges = new Set();
+    let fireQueue = [];
+    let fireTimer = 0;
+    let statIndex = 0;
+
+    function generate() {
+        nodes.length = 0;
+        edges.length = 0;
+        for (let i = 0; i < nodeCount; i++) {
+            nodes.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                r: 2 + Math.random() * 2,
+                lit: false,
+                litTime: 0
+            });
+        }
+        // Connect nearby nodes
+        for (let i = 0; i < nodes.length; i++) {
+            for (let j = i + 1; j < nodes.length; j++) {
+                const dist = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
+                const threshold = Math.min(w, h) * 0.18;
+                if (dist < threshold) {
+                    edges.push({ a: i, b: j, lit: false });
+                }
+            }
+        }
+    }
+
+    function resize() {
+        const r = setupCanvas(canvas);
+        ctx = r.ctx; w = r.w; h = r.h;
+        generate();
+    }
+
+    function startFiring() {
+        if (hasFired) return;
+        hasFired = true;
+        litNodes.clear();
+        litEdges.clear();
+        statIndex = 0;
+
+        // Start from center-ish node
+        let bestIdx = 0, bestDist = Infinity;
+        nodes.forEach((n, i) => {
+            const d = Math.hypot(n.x - w / 2, n.y - h / 2);
+            if (d < bestDist) { bestDist = d; bestIdx = i; }
+        });
+
+        fireQueue = [{ nodeIdx: bestIdx, delay: 0 }];
+    }
+
+    function render() {
+        if (!isActive) return;
+        requestAnimationFrame(render);
+        time++;
+        ctx.clearRect(0, 0, w, h);
+
+        // Process fire queue
+        if (fireQueue.length > 0) {
+            fireTimer++;
+            if (fireTimer % 3 === 0) {
+                const batch = [];
+                const next = fireQueue.shift();
+                if (next && !litNodes.has(next.nodeIdx)) {
+                    litNodes.add(next.nodeIdx);
+                    nodes[next.nodeIdx].lit = true;
+                    nodes[next.nodeIdx].litTime = time;
+
+                    // Find connected unlit nodes
+                    edges.forEach((edge, ei) => {
+                        if (edge.a === next.nodeIdx || edge.b === next.nodeIdx) {
+                            litEdges.add(ei);
+                            edge.lit = true;
+                            const other = edge.a === next.nodeIdx ? edge.b : edge.a;
+                            if (!litNodes.has(other)) {
+                                fireQueue.push({ nodeIdx: other, delay: 0 });
+                            }
+                        }
+                    });
+
+                    // Reveal stats
+                    const litRatio = litNodes.size / nodes.length;
+                    const stats = document.querySelectorAll('.synapse-stat');
+                    if (litRatio > 0.2 && statIndex < 1) { stats[0].classList.add('revealed'); statIndex = 1; }
+                    if (litRatio > 0.4 && statIndex < 2) { stats[1].classList.add('revealed'); statIndex = 2; }
+                    if (litRatio > 0.6 && statIndex < 3) { stats[2].classList.add('revealed'); statIndex = 3; }
+                    if (litRatio > 0.8 && statIndex < 4) { stats[3].classList.add('revealed'); statIndex = 4; }
+                }
+            }
+        }
+
+        // Draw edges
+        edges.forEach((edge, i) => {
+            const a = nodes[edge.a];
+            const b = nodes[edge.b];
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            if (edge.lit) {
+                const age = (time - Math.max(a.litTime || 0, b.litTime || 0));
+                const flash = Math.max(0, 1 - age / 60);
+                ctx.strokeStyle = `rgba(201, 169, 110, ${0.15 + flash * 0.4})`;
+                ctx.lineWidth = 0.8 + flash;
+            } else {
+                ctx.strokeStyle = 'rgba(201, 169, 110, 0.04)';
+                ctx.lineWidth = 0.5;
+            }
+            ctx.stroke();
+        });
+
+        // Draw nodes
+        nodes.forEach(node => {
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
+            if (node.lit) {
+                const age = (time - node.litTime);
+                const flash = Math.max(0, 1 - age / 40);
+                ctx.fillStyle = `rgba(201, 169, 110, ${0.3 + flash * 0.7})`;
+                // Glow
+                if (flash > 0) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, node.r + 6 + flash * 8, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(201, 169, 110, ${flash * 0.15})`;
+                    ctx.fill();
+                    ctx.restore();
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(201, 169, 110, ${0.3 + flash * 0.7})`;
+                }
+            } else {
+                ctx.fillStyle = 'rgba(201, 169, 110, 0.08)';
+            }
+            ctx.fill();
+        });
+    }
+
+    resize();
+    window.addEventListener('resize', () => { resize(); hasFired = false; });
+
+    ScrollTrigger.create({
+        trigger: '#finaleSection',
+        start: 'top 60%',
+        onEnter: () => {
+            isActive = true;
+            startFiring();
+            render();
+        },
+        onLeave: () => { isActive = false; },
+        onEnterBack: () => {
+            isActive = true;
+            if (!hasFired) startFiring();
+            render();
+        },
+        onLeaveBack: () => { isActive = false; }
+    });
+})();
 </script>
 </body>
 </html>
