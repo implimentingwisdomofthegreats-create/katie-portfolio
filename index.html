@@ -434,7 +434,7 @@
             justify-content: center;
             align-items: center;
             opacity: 0;
-            will-change: opacity;
+            visibility: hidden;
         }
 
         .brain-canvas-wrap {
@@ -476,23 +476,7 @@
             color: var(--warm);
         }
 
-        .brain-finale-text {
-            position: absolute;
-            bottom: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            opacity: 0;
-            transition: opacity 0.5s;
-            z-index: 2;
-        }
-
-        .brain-finale-text p {
-            font-family: 'Instrument Serif', serif;
-            font-style: italic;
-            font-size: clamp(1.1rem, 2.5vw, 1.6rem);
-            color: var(--warm-light);
-        }
+        /* brain-finale-text removed */
 
         /* Subject Cards */
         .subject-card {
@@ -589,7 +573,7 @@
             padding: 60px 24px;
             text-align: center;
             opacity: 0;
-            will-change: opacity;
+            visibility: hidden;
         }
 
         .cell-canvas-wrap {
@@ -647,7 +631,7 @@
             padding: 60px 24px;
             text-align: center;
             opacity: 0;
-            will-change: opacity;
+            visibility: hidden;
         }
 
         .gpa-canvas-wrap {
@@ -823,190 +807,7 @@
             border-color: var(--warm);
         }
 
-        /* DNA Base Pair Matching Game */
-        .dna-game {
-            margin: 60px auto 0;
-            max-width: 500px;
-            text-align: center;
-        }
-
-        .dna-game-title {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.65rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--gray);
-            margin-bottom: 20px;
-        }
-
-        .dna-game-hint {
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 300;
-            font-size: 0.75rem;
-            color: var(--gray-dark);
-            margin-bottom: 16px;
-        }
-
-        .dna-strand {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
-
-        .dna-base {
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Space Mono', monospace;
-            font-size: 1rem;
-            font-weight: 700;
-            border-radius: 6px;
-            border: 1px solid;
-            user-select: none;
-        }
-
-        .dna-base.template {
-            background: rgba(201, 169, 110, 0.08);
-            cursor: default;
-        }
-
-        .dna-base.slot {
-            border-style: dashed;
-            border-color: rgba(201, 169, 110, 0.2);
-            color: transparent;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            background: rgba(201, 169, 110, 0.02);
-        }
-
-        .dna-base.slot:hover {
-            border-color: rgba(201, 169, 110, 0.4);
-            background: rgba(201, 169, 110, 0.06);
-        }
-
-        .dna-base.slot.filled {
-            border-style: solid;
-            cursor: default;
-        }
-
-        .dna-base.slot.correct {
-            animation: baseCorrect 0.4s ease;
-        }
-
-        .dna-base.slot.wrong {
-            animation: baseWrong 0.4s ease;
-        }
-
-        @keyframes baseCorrect {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.15); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes baseWrong {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-4px); }
-            40% { transform: translateX(4px); }
-            60% { transform: translateX(-3px); }
-            80% { transform: translateX(3px); }
-        }
-
-        .dna-bond-line {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
-
-        .dna-bond {
-            width: 44px;
-            height: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(201, 169, 110, 0.15);
-            font-size: 0.6rem;
-            transition: color 0.3s;
-        }
-
-        .dna-bond.active {
-            color: rgba(201, 169, 110, 0.5);
-        }
-
-        .dna-palette {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 24px;
-        }
-
-        .dna-palette-btn {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Space Mono', monospace;
-            font-size: 1.1rem;
-            font-weight: 700;
-            border-radius: 50%;
-            border: 2px solid;
-            cursor: pointer;
-            background: transparent;
-            transition: all 0.2s ease;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .dna-palette-btn:hover, .dna-palette-btn:active {
-            transform: scale(1.1);
-        }
-
-        .dna-palette-btn.base-a { color: var(--base-a); border-color: var(--base-a); }
-        .dna-palette-btn.base-t { color: var(--base-t); border-color: var(--base-t); }
-        .dna-palette-btn.base-g { color: var(--base-g); border-color: var(--base-g); }
-        .dna-palette-btn.base-c { color: var(--base-c); border-color: var(--base-c); }
-
-        .dna-palette-btn:hover { box-shadow: 0 0 15px currentColor; }
-
-        .dna-game-msg {
-            font-family: 'Instrument Serif', serif;
-            font-size: 1.2rem;
-            color: var(--warm);
-            margin-top: 20px;
-            min-height: 30px;
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-
-        .dna-game-msg.show { opacity: 1; }
-
-        .dna-game-reset {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.6rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--gray);
-            background: none;
-            border: 1px solid var(--gray-dark);
-            padding: 6px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            margin-top: 12px;
-            transition: color 0.3s, border-color 0.3s;
-            display: none;
-        }
-
-        .dna-game-reset.show {
-            display: inline-block;
-        }
-
-        .dna-game-reset:hover {
-            color: var(--warm);
-            border-color: var(--warm);
-        }
+        /* DNA game removed */
 
         /* ═══════════════════════════════════════════════
            GOLDEN SPIRAL — FUTURE
@@ -1127,21 +928,7 @@
             line-height: 1.5;
         }
 
-        .boba-formula {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.65rem;
-            color: var(--gray-dark);
-            margin-top: 16px;
-            letter-spacing: 1px;
-        }
-
-        .boba-aside {
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 300;
-            font-size: 0.9rem;
-            color: var(--gray);
-            margin-top: 8px;
-        }
+        /* boba formula/aside removed */
 
         /* ═══════════════════════════════════════════════
            FINALE — SYNAPSE LIGHTNING
@@ -1288,9 +1075,6 @@
             .subject-card { width: min(360px, 90vw); }
             .buzzword { font-size: 0.5rem; padding: 4px 10px; }
 
-            /* Touch-friendly DNA game targets */
-            .dna-palette-btn { width: 56px; height: 56px; }
-            .dna-base { width: 40px; height: 40px; }
 
             /* Section spacing */
             .start-section { padding: 80px 20px; }
@@ -1316,9 +1100,6 @@
             .subject-card-name { font-size: clamp(1.6rem, 5vw, 2.4rem); }
             .subject-card-fact { font-size: 0.75rem; }
 
-            .dna-base { width: 36px; height: 36px; font-size: 0.8rem; }
-            .dna-palette-btn { width: 50px; height: 50px; font-size: 1rem; }
-            .dna-game-hint { font-size: 0.7rem; }
 
             .start-acronym { gap: 6px; }
             .start-letter { font-size: 0.6rem; padding: 5px 10px; }
@@ -1439,7 +1220,7 @@
     </div>
 </section>
 
-<div class="spacer-sm"></div>
+<div class="spacer"></div>
 
 <!-- ═══════════ 3D BRAIN — SUBJECTS ═══════════ -->
 <section class="brain-section" id="brainSection">
@@ -1534,10 +1315,6 @@
         </div>
     </div>
 
-    <div class="brain-finale-text" id="brainFinale">
-        <p>Katie's mind — always expanding.</p>
-    </div>
-
     <!-- Accessible fallback -->
     <ul class="sr-only">
         <li>Mathematics — Parietal Lobe — numerical cognition</li>
@@ -1619,25 +1396,6 @@
         <span class="tech-tag">Eureka! Journal</span>
     </div>
 
-    <!-- DNA Base Pair Matching Game -->
-    <div class="dna-game fade-element delay-2" id="dnaGame">
-        <div class="dna-game-title">Interactive: Complete the DNA Strand</div>
-        <div class="dna-game-hint">A pairs with T · G pairs with C</div>
-
-        <div class="dna-strand" id="templateStrand"></div>
-        <div class="dna-bond-line" id="bondLine"></div>
-        <div class="dna-strand" id="complementStrand"></div>
-
-        <div class="dna-palette">
-            <button class="dna-palette-btn base-a" data-base="A">A</button>
-            <button class="dna-palette-btn base-t" data-base="T">T</button>
-            <button class="dna-palette-btn base-g" data-base="G">G</button>
-            <button class="dna-palette-btn base-c" data-base="C">C</button>
-        </div>
-
-        <div class="dna-game-msg" id="dnaGameMsg"></div>
-        <button class="dna-game-reset" id="dnaGameReset">Play again</button>
-    </div>
 </section>
 
 <div class="spacer"></div>
@@ -1701,8 +1459,6 @@
     <p class="boba-text fade-element delay-1">
         And after conquering all of that?<br>She just wants boba.
     </p>
-    <p class="boba-formula fade-element delay-2">C₁₂H₂₂O₁₁ · H₂O · C₈H₁₀N₄O₂</p>
-    <p class="boba-aside fade-element delay-3">Sugar, water, and caffeine. She's earned it.</p>
 </section>
 
 <div class="spacer"></div>
@@ -2075,7 +1831,7 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
 (function() {
     const canvas = document.getElementById('brainCanvas');
     const header = document.getElementById('brainHeader');
-    const finaleText = document.getElementById('brainFinale');
+    // Brain finale text removed
 
     // Subject data with 3D brain region positions (x, y, z in brain-local coords)
     const subjects = [
@@ -2264,8 +2020,7 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
         // Header fade (visible only at start)
         header.style.opacity = scrollProgress < 0.05 ? '1' : Math.max(0, 1 - (scrollProgress - 0.05) / 0.05);
 
-        // Finale text (visible at end)
-        finaleText.style.opacity = scrollProgress > 0.88 ? Math.min(1, (scrollProgress - 0.88) / 0.08) : '0';
+        // Brain finale text removed
 
         // Determine active subject
         const activeIndex = getActiveSubjectIndex(scrollProgress);
@@ -2334,42 +2089,41 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
     resize();
     window.addEventListener('resize', resize);
 
-    // Pre-render the brain at initial state so the canvas has content for the fade-in
-    brainWire.rotation.y = 0.5;
-    brainPoints.rotation.y = 0.5;
-    brainWire.rotation.x = 0;
-    brainPoints.rotation.x = 0;
-    header.style.opacity = '1';
-    finaleText.style.opacity = '0';
-    regionMeshes.forEach(rm => { rm.mat.opacity = 0.05; rm.coreMat.opacity = 0.1; });
-    renderer.render(scene, camera);
-
     const brainEl = document.getElementById('brainSection');
 
-    ScrollTrigger.create({
-        trigger: '#brainSection',
-        start: 'top top',
-        end: '+=500%',
-        pin: true,
-        anticipatePin: 1,
-        scrub: 1,
-        onUpdate: (self) => { scrollProgress = self.progress; },
-        onEnter: () => {
-            isActive = true;
-            gsap.to(brainEl, { opacity: 1, duration: 0.8, ease: 'power2.out' });
-            render();
-        },
-        onLeave: () => { isActive = false; cancelAnimationFrame(animFrame); },
-        onEnterBack: () => {
-            isActive = true;
-            gsap.set(brainEl, { opacity: 1 });
-            render();
-        },
-        onLeaveBack: () => {
-            isActive = false;
-            cancelAnimationFrame(animFrame);
-            gsap.to(brainEl, { opacity: 0, duration: 0.3 });
-        }
+    // Defer ScrollTrigger creation to run AFTER the cell section's trigger
+    // is created (cell JS runs after brain JS but cell is above brain in DOM).
+    // Without deferring, the brain's trigger fires onEnter immediately with
+    // incorrect position (cell's pin spacer doesn't exist yet).
+    requestAnimationFrame(() => {
+        ScrollTrigger.create({
+            trigger: '#brainSection',
+            start: 'top top',
+            end: '+=500%',
+            pin: true,
+            scrub: 1,
+            onUpdate: (self) => { scrollProgress = self.progress; },
+            onEnter: () => {
+                isActive = true;
+                brainEl.style.visibility = 'visible';
+                gsap.to(brainEl, { opacity: 1, duration: 0.8, ease: 'power2.out' });
+                render();
+            },
+            onLeave: () => { isActive = false; cancelAnimationFrame(animFrame); },
+            onEnterBack: () => {
+                isActive = true;
+                brainEl.style.visibility = 'visible';
+                gsap.set(brainEl, { opacity: 1 });
+                render();
+            },
+            onLeaveBack: () => {
+                isActive = false;
+                cancelAnimationFrame(animFrame);
+                gsap.to(brainEl, { opacity: 0, duration: 0.3, onComplete: () => {
+                    brainEl.style.visibility = 'hidden';
+                }});
+            }
+        });
     });
 })();
 
@@ -2491,18 +2245,25 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
         onUpdate: (self) => { cellProgress = self.progress; },
         onEnter: () => {
             isActive = true;
-            gsap.to('#cellSection', { opacity: 1, duration: 0.8, ease: 'power2.out' });
+            const el = document.getElementById('cellSection');
+            el.style.visibility = 'visible';
+            gsap.to(el, { opacity: 1, duration: 0.8, ease: 'power2.out' });
             render();
         },
         onLeave: () => { isActive = false; },
         onEnterBack: () => {
             isActive = true;
-            gsap.set('#cellSection', { opacity: 1 });
+            const el = document.getElementById('cellSection');
+            el.style.visibility = 'visible';
+            gsap.set(el, { opacity: 1 });
             render();
         },
         onLeaveBack: () => {
             isActive = false;
-            gsap.to('#cellSection', { opacity: 0, duration: 0.3 });
+            const el = document.getElementById('cellSection');
+            gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => {
+                el.style.visibility = 'hidden';
+            }});
         }
     });
 })();
@@ -2663,18 +2424,25 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
         },
         onEnter: () => {
             isActive = true;
-            gsap.to('#gpaSection', { opacity: 1, duration: 0.8, ease: 'power2.out' });
+            const el = document.getElementById('gpaSection');
+            el.style.visibility = 'visible';
+            gsap.to(el, { opacity: 1, duration: 0.8, ease: 'power2.out' });
             render();
         },
         onLeave: () => { isActive = false; },
         onEnterBack: () => {
             isActive = true;
-            gsap.set('#gpaSection', { opacity: 1 });
+            const el = document.getElementById('gpaSection');
+            el.style.visibility = 'visible';
+            gsap.set(el, { opacity: 1 });
             render();
         },
         onLeaveBack: () => {
             isActive = false;
-            gsap.to('#gpaSection', { opacity: 0, duration: 0.3 });
+            const el = document.getElementById('gpaSection');
+            gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => {
+                el.style.visibility = 'hidden';
+            }});
         }
     });
 })();
@@ -2818,153 +2586,6 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
         pearl.style.cursor = 'pointer';
         pearl.style.pointerEvents = 'auto';
     });
-})();
-
-// ═══════════════════════════════════════════════════════
-// DNA BASE PAIR MATCHING GAME (START section)
-// ═══════════════════════════════════════════════════════
-(function() {
-    const complement = { A: 'T', T: 'A', G: 'C', C: 'G' };
-    const colorMap = { A: '#4ecdc4', T: '#ff6b6b', G: '#c9a96e', C: '#a8e6cf' };
-    const templateEl = document.getElementById('templateStrand');
-    const complementEl = document.getElementById('complementStrand');
-    const bondLineEl = document.getElementById('bondLine');
-    const msgEl = document.getElementById('dnaGameMsg');
-    const resetBtn = document.getElementById('dnaGameReset');
-    const paletteBtns = document.querySelectorAll('.dna-palette-btn');
-
-    let template = [];
-    let slots = [];
-    let activeSlot = -1;
-    let selectedBase = null;
-    let completed = 0;
-
-    function randomSequence(len) {
-        const bases = ['A', 'T', 'G', 'C'];
-        return Array.from({ length: len }, () => bases[Math.floor(Math.random() * 4)]);
-    }
-
-    function initGame() {
-        template = randomSequence(8);
-        slots = new Array(8).fill(null);
-        activeSlot = 0;
-        selectedBase = null;
-        completed = 0;
-        msgEl.classList.remove('show');
-        msgEl.textContent = '';
-        resetBtn.classList.remove('show');
-
-        // Build template strand
-        templateEl.innerHTML = '';
-        template.forEach(base => {
-            const div = document.createElement('div');
-            div.className = 'dna-base template';
-            div.textContent = base;
-            div.style.color = colorMap[base];
-            div.style.borderColor = colorMap[base] + '40';
-            templateEl.appendChild(div);
-        });
-
-        // Build bond line
-        bondLineEl.innerHTML = '';
-        template.forEach(() => {
-            const div = document.createElement('div');
-            div.className = 'dna-bond';
-            div.textContent = '|||';
-            bondLineEl.appendChild(div);
-        });
-
-        // Build complement strand (empty slots)
-        complementEl.innerHTML = '';
-        template.forEach((_, i) => {
-            const div = document.createElement('div');
-            div.className = 'dna-base slot';
-            div.dataset.index = i;
-            div.style.borderColor = 'rgba(201, 169, 110, 0.2)';
-            div.textContent = '?';
-            div.style.color = 'rgba(201, 169, 110, 0.15)';
-            if (i === 0) div.style.borderColor = 'rgba(201, 169, 110, 0.5)';
-            div.addEventListener('click', () => onSlotClick(i));
-            complementEl.appendChild(div);
-        });
-
-        // Enable palette
-        paletteBtns.forEach(btn => {
-            btn.style.opacity = '1';
-            btn.style.pointerEvents = 'auto';
-        });
-    }
-
-    function onSlotClick(index) {
-        if (slots[index] !== null) return;
-        activeSlot = index;
-        // Highlight active slot
-        complementEl.querySelectorAll('.slot').forEach((el, i) => {
-            if (i === index && slots[i] === null) {
-                el.style.borderColor = 'rgba(201, 169, 110, 0.5)';
-            } else if (slots[i] === null) {
-                el.style.borderColor = 'rgba(201, 169, 110, 0.2)';
-            }
-        });
-    }
-
-    function placeBase(base) {
-        if (activeSlot < 0 || activeSlot >= 8 || slots[activeSlot] !== null) return;
-
-        const correct = complement[template[activeSlot]];
-        const slotEl = complementEl.children[activeSlot];
-        const bondEl = bondLineEl.children[activeSlot];
-
-        if (base === correct) {
-            slots[activeSlot] = base;
-            slotEl.textContent = base;
-            slotEl.style.color = colorMap[base];
-            slotEl.style.borderColor = colorMap[base] + '60';
-            slotEl.classList.add('filled', 'correct');
-            bondEl.classList.add('active');
-            completed++;
-
-            if (completed === 8) {
-                msgEl.textContent = 'Perfect complementary strand — you think like a researcher.';
-                msgEl.classList.add('show');
-                resetBtn.classList.add('show');
-            } else {
-                // Advance to next empty slot
-                for (let i = 0; i < 8; i++) {
-                    if (slots[i] === null) {
-                        activeSlot = i;
-                        complementEl.querySelectorAll('.slot').forEach((el, j) => {
-                            if (j === i) el.style.borderColor = 'rgba(201, 169, 110, 0.5)';
-                            else if (slots[j] === null) el.style.borderColor = 'rgba(201, 169, 110, 0.2)';
-                        });
-                        break;
-                    }
-                }
-            }
-        } else {
-            slotEl.classList.add('wrong');
-            setTimeout(() => slotEl.classList.remove('wrong'), 400);
-        }
-    }
-
-    // Palette button clicks
-    paletteBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            placeBase(btn.dataset.base);
-        });
-    });
-
-    // Keyboard support
-    document.addEventListener('keydown', e => {
-        const key = e.key.toUpperCase();
-        if (['A', 'T', 'G', 'C'].includes(key)) {
-            placeBase(key);
-        }
-    });
-
-    resetBtn.addEventListener('click', initGame);
-
-    initGame();
 })();
 
 // ═══════════════════════════════════════════════════════
