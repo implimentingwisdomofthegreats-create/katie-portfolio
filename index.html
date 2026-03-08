@@ -610,6 +610,316 @@
         }
 
         /* ═══════════════════════════════════════════════
+           START RESEARCH PROGRAM
+           ═══════════════════════════════════════════════ */
+        .start-section {
+            padding: 120px 24px;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .start-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .start-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .start-title em {
+            font-style: italic;
+            color: var(--warm);
+        }
+
+        .start-acronym {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .start-letter {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            padding: 6px 12px;
+            border: 1px solid rgba(201, 169, 110, 0.2);
+            border-radius: 4px;
+            color: var(--gray-light);
+            text-transform: uppercase;
+        }
+
+        .start-letter strong {
+            color: var(--warm);
+            font-weight: 700;
+        }
+
+        .start-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 24px;
+            margin: 48px 0;
+        }
+
+        .start-stat {
+            text-align: center;
+            padding: 24px 16px;
+            border: 1px solid rgba(201, 169, 110, 0.1);
+            border-radius: 8px;
+            background: rgba(201, 169, 110, 0.02);
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        .start-stat:hover {
+            border-color: rgba(201, 169, 110, 0.3);
+            background: rgba(201, 169, 110, 0.05);
+        }
+
+        .start-stat-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            color: var(--warm);
+            line-height: 1;
+        }
+
+        .start-stat-label {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .start-desc {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+            color: var(--gray-light);
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .start-techniques {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 32px;
+        }
+
+        .tech-tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            padding: 5px 10px;
+            border: 1px solid rgba(201, 169, 110, 0.15);
+            border-radius: 20px;
+            color: var(--gray);
+            text-transform: uppercase;
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        .tech-tag:hover {
+            color: var(--warm);
+            border-color: var(--warm);
+        }
+
+        /* DNA Base Pair Matching Game */
+        .dna-game {
+            margin: 60px auto 0;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .dna-game-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .dna-game-hint {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: 0.75rem;
+            color: var(--gray-dark);
+            margin-bottom: 16px;
+        }
+
+        .dna-strand {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .dna-base {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 6px;
+            border: 1px solid;
+            user-select: none;
+        }
+
+        .dna-base.template {
+            background: rgba(201, 169, 110, 0.08);
+            cursor: default;
+        }
+
+        .dna-base.slot {
+            border-style: dashed;
+            border-color: rgba(201, 169, 110, 0.2);
+            color: transparent;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: rgba(201, 169, 110, 0.02);
+        }
+
+        .dna-base.slot:hover {
+            border-color: rgba(201, 169, 110, 0.4);
+            background: rgba(201, 169, 110, 0.06);
+        }
+
+        .dna-base.slot.filled {
+            border-style: solid;
+            cursor: default;
+        }
+
+        .dna-base.slot.correct {
+            animation: baseCorrect 0.4s ease;
+        }
+
+        .dna-base.slot.wrong {
+            animation: baseWrong 0.4s ease;
+        }
+
+        @keyframes baseCorrect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes baseWrong {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-4px); }
+            40% { transform: translateX(4px); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
+        }
+
+        .dna-bond-line {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .dna-bond {
+            width: 44px;
+            height: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(201, 169, 110, 0.15);
+            font-size: 0.6rem;
+            transition: color 0.3s;
+        }
+
+        .dna-bond.active {
+            color: rgba(201, 169, 110, 0.5);
+        }
+
+        .dna-palette {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .dna-palette-btn {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 50%;
+            border: 2px solid;
+            cursor: pointer;
+            background: transparent;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .dna-palette-btn:hover, .dna-palette-btn:active {
+            transform: scale(1.1);
+        }
+
+        .dna-palette-btn.base-a { color: var(--base-a); border-color: var(--base-a); }
+        .dna-palette-btn.base-t { color: var(--base-t); border-color: var(--base-t); }
+        .dna-palette-btn.base-g { color: var(--base-g); border-color: var(--base-g); }
+        .dna-palette-btn.base-c { color: var(--base-c); border-color: var(--base-c); }
+
+        .dna-palette-btn:hover { box-shadow: 0 0 15px currentColor; }
+
+        .dna-game-msg {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.2rem;
+            color: var(--warm);
+            margin-top: 20px;
+            min-height: 30px;
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .dna-game-msg.show { opacity: 1; }
+
+        .dna-game-reset {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gray);
+            background: none;
+            border: 1px solid var(--gray-dark);
+            padding: 6px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: color 0.3s, border-color 0.3s;
+            display: none;
+        }
+
+        .dna-game-reset.show {
+            display: inline-block;
+        }
+
+        .dna-game-reset:hover {
+            color: var(--warm);
+            border-color: var(--warm);
+        }
+
+        /* ═══════════════════════════════════════════════
            GOLDEN SPIRAL — FUTURE
            ═══════════════════════════════════════════════ */
         .spiral-section {
@@ -1034,6 +1344,75 @@
         <span class="equation">f(x) = 4(1 − e⁻³ˣ)</span>
         <span class="equation">f'(x) = 12e⁻³ˣ &gt; 0</span>
         <span class="equation">lim f(x) = 4.0 = perfection</span>
+    </div>
+</section>
+
+<div class="spacer"></div>
+
+<!-- ═══════════ START RESEARCH PROGRAM ═══════════ -->
+<section class="start-section" id="startSection">
+    <div class="start-header">
+        <span class="label fade-element">Beyond the classroom</span>
+        <div class="divider fade-element delay-1"></div>
+        <h2 class="start-title fade-element delay-2">Not just a student.<br>A <em>researcher</em>.</h2>
+    </div>
+
+    <div class="start-acronym fade-element delay-3">
+        <span class="start-letter"><strong>S</strong>TEM</span>
+        <span class="start-letter"><strong>A</strong>cademic</span>
+        <span class="start-letter"><strong>R</strong>esearch</span>
+        <span class="start-letter">&amp; <strong>T</strong>raining</span>
+    </div>
+
+    <div class="start-stats fade-element delay-3">
+        <div class="start-stat">
+            <div class="start-stat-number">$1.4M</div>
+            <div class="start-stat-label">NSF-funded<br>research grant</div>
+        </div>
+        <div class="start-stat">
+            <div class="start-stat-number">~32%</div>
+            <div class="start-stat-label">acceptance<br>rate</div>
+        </div>
+        <div class="start-stat">
+            <div class="start-stat-number">50</div>
+            <div class="start-stat-label">students selected<br>per semester</div>
+        </div>
+    </div>
+
+    <p class="start-desc fade-element">
+        Katie was selected for Wake Tech's START program — an NSF-funded
+        undergraduate research initiative where community college students
+        conduct faculty-mentored, hands-on research using the same techniques
+        found in professional labs. Published. Peer-reviewed. At a two-year college.
+    </p>
+
+    <div class="start-techniques fade-element delay-1">
+        <span class="tech-tag">CRISPR</span>
+        <span class="tech-tag">PCR</span>
+        <span class="tech-tag">Gel Electrophoresis</span>
+        <span class="tech-tag">Gene Regulation</span>
+        <span class="tech-tag">Peer Review</span>
+        <span class="tech-tag">Eureka! Journal</span>
+    </div>
+
+    <!-- DNA Base Pair Matching Game -->
+    <div class="dna-game fade-element delay-2" id="dnaGame">
+        <div class="dna-game-title">Interactive: Complete the DNA Strand</div>
+        <div class="dna-game-hint">A pairs with T · G pairs with C</div>
+
+        <div class="dna-strand" id="templateStrand"></div>
+        <div class="dna-bond-line" id="bondLine"></div>
+        <div class="dna-strand" id="complementStrand"></div>
+
+        <div class="dna-palette">
+            <button class="dna-palette-btn base-a" data-base="A">A</button>
+            <button class="dna-palette-btn base-t" data-base="T">T</button>
+            <button class="dna-palette-btn base-g" data-base="G">G</button>
+            <button class="dna-palette-btn base-c" data-base="C">C</button>
+        </div>
+
+        <div class="dna-game-msg" id="dnaGameMsg"></div>
+        <button class="dna-game-reset" id="dnaGameReset">Play again</button>
     </div>
 </section>
 
@@ -2076,6 +2455,153 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
         pearl.style.cursor = 'pointer';
         pearl.style.pointerEvents = 'auto';
     });
+})();
+
+// ═══════════════════════════════════════════════════════
+// DNA BASE PAIR MATCHING GAME (START section)
+// ═══════════════════════════════════════════════════════
+(function() {
+    const complement = { A: 'T', T: 'A', G: 'C', C: 'G' };
+    const colorMap = { A: '#4ecdc4', T: '#ff6b6b', G: '#c9a96e', C: '#a8e6cf' };
+    const templateEl = document.getElementById('templateStrand');
+    const complementEl = document.getElementById('complementStrand');
+    const bondLineEl = document.getElementById('bondLine');
+    const msgEl = document.getElementById('dnaGameMsg');
+    const resetBtn = document.getElementById('dnaGameReset');
+    const paletteBtns = document.querySelectorAll('.dna-palette-btn');
+
+    let template = [];
+    let slots = [];
+    let activeSlot = -1;
+    let selectedBase = null;
+    let completed = 0;
+
+    function randomSequence(len) {
+        const bases = ['A', 'T', 'G', 'C'];
+        return Array.from({ length: len }, () => bases[Math.floor(Math.random() * 4)]);
+    }
+
+    function initGame() {
+        template = randomSequence(8);
+        slots = new Array(8).fill(null);
+        activeSlot = 0;
+        selectedBase = null;
+        completed = 0;
+        msgEl.classList.remove('show');
+        msgEl.textContent = '';
+        resetBtn.classList.remove('show');
+
+        // Build template strand
+        templateEl.innerHTML = '';
+        template.forEach(base => {
+            const div = document.createElement('div');
+            div.className = 'dna-base template';
+            div.textContent = base;
+            div.style.color = colorMap[base];
+            div.style.borderColor = colorMap[base] + '40';
+            templateEl.appendChild(div);
+        });
+
+        // Build bond line
+        bondLineEl.innerHTML = '';
+        template.forEach(() => {
+            const div = document.createElement('div');
+            div.className = 'dna-bond';
+            div.textContent = '|||';
+            bondLineEl.appendChild(div);
+        });
+
+        // Build complement strand (empty slots)
+        complementEl.innerHTML = '';
+        template.forEach((_, i) => {
+            const div = document.createElement('div');
+            div.className = 'dna-base slot';
+            div.dataset.index = i;
+            div.style.borderColor = 'rgba(201, 169, 110, 0.2)';
+            div.textContent = '?';
+            div.style.color = 'rgba(201, 169, 110, 0.15)';
+            if (i === 0) div.style.borderColor = 'rgba(201, 169, 110, 0.5)';
+            div.addEventListener('click', () => onSlotClick(i));
+            complementEl.appendChild(div);
+        });
+
+        // Enable palette
+        paletteBtns.forEach(btn => {
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+        });
+    }
+
+    function onSlotClick(index) {
+        if (slots[index] !== null) return;
+        activeSlot = index;
+        // Highlight active slot
+        complementEl.querySelectorAll('.slot').forEach((el, i) => {
+            if (i === index && slots[i] === null) {
+                el.style.borderColor = 'rgba(201, 169, 110, 0.5)';
+            } else if (slots[i] === null) {
+                el.style.borderColor = 'rgba(201, 169, 110, 0.2)';
+            }
+        });
+    }
+
+    function placeBase(base) {
+        if (activeSlot < 0 || activeSlot >= 8 || slots[activeSlot] !== null) return;
+
+        const correct = complement[template[activeSlot]];
+        const slotEl = complementEl.children[activeSlot];
+        const bondEl = bondLineEl.children[activeSlot];
+
+        if (base === correct) {
+            slots[activeSlot] = base;
+            slotEl.textContent = base;
+            slotEl.style.color = colorMap[base];
+            slotEl.style.borderColor = colorMap[base] + '60';
+            slotEl.classList.add('filled', 'correct');
+            bondEl.classList.add('active');
+            completed++;
+
+            if (completed === 8) {
+                msgEl.textContent = 'Perfect complementary strand — you think like a researcher.';
+                msgEl.classList.add('show');
+                resetBtn.classList.add('show');
+            } else {
+                // Advance to next empty slot
+                for (let i = 0; i < 8; i++) {
+                    if (slots[i] === null) {
+                        activeSlot = i;
+                        complementEl.querySelectorAll('.slot').forEach((el, j) => {
+                            if (j === i) el.style.borderColor = 'rgba(201, 169, 110, 0.5)';
+                            else if (slots[j] === null) el.style.borderColor = 'rgba(201, 169, 110, 0.2)';
+                        });
+                        break;
+                    }
+                }
+            }
+        } else {
+            slotEl.classList.add('wrong');
+            setTimeout(() => slotEl.classList.remove('wrong'), 400);
+        }
+    }
+
+    // Palette button clicks
+    paletteBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            placeBase(btn.dataset.base);
+        });
+    });
+
+    // Keyboard support
+    document.addEventListener('keydown', e => {
+        const key = e.key.toUpperCase();
+        if (['A', 'T', 'G', 'C'].includes(key)) {
+            placeBase(key);
+        }
+    });
+
+    resetBtn.addEventListener('click', initGame);
+
+    initGame();
 })();
 
 // ═══════════════════════════════════════════════════════
