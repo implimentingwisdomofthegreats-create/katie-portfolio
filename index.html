@@ -1831,7 +1831,7 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
 })();
 
 // ═══════════════════════════════════════════════════════
-// 3. NEURON NETWORK — SUBJECTS
+// 3. INTERACTIVE BRAIN — SUBJECTS
 // ═══════════════════════════════════════════════════════
 (function() {
     const canvas = document.getElementById('neuronCanvas');
@@ -1842,72 +1842,252 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
     let ctx, w, h;
     let isActive = false;
     let time = 0;
-    let hoveredNode = null;
+    let hoveredRegion = null;
+    let brainScale, brainOffsetX, brainOffsetY;
 
-    const subjects = [
-        { id: 'katie', label: 'Katie', x: 0.5, y: 0.48, r: 22, color: '#c9a96e', desc: 'The central hub — connecting everything' },
-        { id: 'math', label: 'Mathematics', x: 0.18, y: 0.22, r: 16, color: '#c9a96e', desc: 'The language of the universe' },
-        { id: 'bio', label: 'Biology', x: 0.82, y: 0.18, r: 16, color: '#4ecdc4', desc: 'The science of life itself' },
-        { id: 'chem', label: 'Chemistry', x: 0.15, y: 0.72, r: 15, color: '#ff6b6b', desc: 'The architecture of matter' },
-        { id: 'psych', label: 'Dev Psychology', x: 0.85, y: 0.75, r: 15, color: '#a8e6cf', desc: 'The map of the human mind' },
-        { id: 'spanish', label: 'Spanish', x: 0.35, y: 0.85, r: 13, color: '#e8d5a8', desc: 'Her third language' },
-        { id: 'english', label: 'English 112', x: 0.65, y: 0.88, r: 13, color: '#d4736c', desc: 'Writing & research' },
+    // Brain outline as a bezier path (side profile, normalized 0-1)
+    // Points define a left-facing brain silhouette
+    const brainOutline = [
+        { x: 0.50, y: 0.08 },  // top center
+        { x: 0.30, y: 0.06 },  // top-front curve
+        { x: 0.14, y: 0.12 },  // upper frontal
+        { x: 0.06, y: 0.28 },  // frontal lobe front
+        { x: 0.04, y: 0.42 },  // frontal lower
+        { x: 0.08, y: 0.56 },  // orbital / eye area
+        { x: 0.18, y: 0.62 },  // frontal base
+        { x: 0.22, y: 0.70 },  // temporal front
+        { x: 0.20, y: 0.80 },  // temporal lower
+        { x: 0.28, y: 0.88 },  // temporal base
+        { x: 0.40, y: 0.92 },  // brain stem area
+        { x: 0.52, y: 0.90 },  // cerebellum bottom
+        { x: 0.62, y: 0.86 },  // cerebellum back
+        { x: 0.72, y: 0.78 },  // occipital lower
+        { x: 0.82, y: 0.64 },  // occipital
+        { x: 0.90, y: 0.48 },  // parietal-occipital
+        { x: 0.92, y: 0.32 },  // parietal
+        { x: 0.86, y: 0.18 },  // upper parietal
+        { x: 0.74, y: 0.10 },  // parietal top
+        { x: 0.60, y: 0.07 },  // top back
     ];
 
-    const connections = [
-        ['katie', 'math'], ['katie', 'bio'], ['katie', 'chem'],
-        ['katie', 'psych'], ['katie', 'spanish'], ['katie', 'english'],
+    // Internal fissure lines (sulci) for brain texture
+    const sulci = [
+        // Central sulcus (divides frontal/parietal)
+        [{ x: 0.52, y: 0.10 }, { x: 0.46, y: 0.25 }, { x: 0.40, y: 0.42 }, { x: 0.36, y: 0.55 }],
+        // Lateral sulcus (sylvian fissure)
+        [{ x: 0.28, y: 0.52 }, { x: 0.40, y: 0.48 }, { x: 0.55, y: 0.46 }, { x: 0.68, y: 0.50 }],
+        // Frontal sulcus
+        [{ x: 0.18, y: 0.22 }, { x: 0.24, y: 0.32 }, { x: 0.28, y: 0.44 }],
+        // Parietal sulcus
+        [{ x: 0.60, y: 0.14 }, { x: 0.66, y: 0.24 }, { x: 0.72, y: 0.38 }],
+        // Temporal sulcus
+        [{ x: 0.24, y: 0.68 }, { x: 0.36, y: 0.72 }, { x: 0.50, y: 0.74 }],
+        // Pre-central gyrus hint
+        [{ x: 0.42, y: 0.12 }, { x: 0.38, y: 0.22 }, { x: 0.34, y: 0.35 }],
+    ];
+
+    // Brain regions mapped to Katie's subjects
+    const regions = [
+        {
+            id: 'math', label: 'Mathematics',
+            lobe: 'Frontal Lobe',
+            desc: 'The language of the universe — logical reasoning & problem solving',
+            color: '#c9a96e',
+            cx: 0.22, cy: 0.35, rx: 0.12, ry: 0.14,
+        },
+        {
+            id: 'bio', label: 'Biology',
+            lobe: 'Parietal Lobe',
+            desc: 'The science of life itself — sensory integration & spatial awareness',
+            color: '#4ecdc4',
+            cx: 0.68, cy: 0.28, rx: 0.13, ry: 0.13,
+        },
+        {
+            id: 'chem', label: 'Chemistry',
+            lobe: 'Occipital Lobe',
+            desc: 'The architecture of matter — visual processing & pattern recognition',
+            color: '#ff6b6b',
+            cx: 0.82, cy: 0.55, rx: 0.09, ry: 0.12,
+        },
+        {
+            id: 'psych', label: 'Dev Psychology',
+            lobe: 'Temporal Lobe',
+            desc: 'The map of the human mind — memory, emotion & language',
+            color: '#a8e6cf',
+            cx: 0.35, cy: 0.72, rx: 0.12, ry: 0.10,
+        },
+        {
+            id: 'spanish', label: 'Spanish',
+            lobe: "Broca's Area",
+            desc: 'Her third language — speech production & language processing',
+            color: '#e8d5a8',
+            cx: 0.16, cy: 0.54, rx: 0.07, ry: 0.07,
+        },
+        {
+            id: 'english', label: 'English 112',
+            lobe: "Wernicke's Area",
+            desc: 'Writing & research — language comprehension & composition',
+            color: '#d4736c',
+            cx: 0.56, cy: 0.52, rx: 0.08, ry: 0.07,
+        },
+    ];
+
+    // Neural pathways between regions
+    const pathways = [
         ['math', 'bio'], ['math', 'chem'], ['bio', 'chem'],
-        ['bio', 'psych'], ['chem', 'bio'],
+        ['bio', 'psych'], ['psych', 'spanish'], ['spanish', 'english'],
+        ['math', 'english'], ['english', 'bio'], ['psych', 'math'],
+        ['spanish', 'math'], ['chem', 'psych'],
     ];
 
     const pulses = [];
     let pulseTimer = 0;
 
-    function getNode(id) { return subjects.find(s => s.id === id); }
-    function nodePos(node) { return { x: node.x * w, y: node.y * h }; }
+    // Scatter neurons inside the brain
+    const neurons = [];
+    for (let i = 0; i < 80; i++) {
+        neurons.push({
+            x: 0.04 + Math.random() * 0.88,
+            y: 0.06 + Math.random() * 0.86,
+            r: 0.8 + Math.random() * 1.2,
+            phase: Math.random() * Math.PI * 2
+        });
+    }
+
+    function getRegion(id) { return regions.find(r => r.id === id); }
+
+    function toCanvas(pt) {
+        return {
+            x: brainOffsetX + pt.x * brainScale,
+            y: brainOffsetY + pt.y * brainScale
+        };
+    }
+
+    function regionCenter(region) {
+        return toCanvas({ x: region.cx, y: region.cy });
+    }
+
+    function isInsideBrain(nx, ny) {
+        // Simple bounding check via ray casting on outline
+        const pts = brainOutline;
+        let inside = false;
+        for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+            const xi = pts[i].x, yi = pts[i].y;
+            const xj = pts[j].x, yj = pts[j].y;
+            if ((yi > ny) !== (yj > ny) && nx < (xj - xi) * (ny - yi) / (yj - yi) + xi) {
+                inside = !inside;
+            }
+        }
+        return inside;
+    }
 
     function spawnPulse() {
-        const conn = connections[Math.floor(Math.random() * connections.length)];
-        const from = getNode(conn[0]);
-        const to = getNode(conn[1]);
+        const p = pathways[Math.floor(Math.random() * pathways.length)];
+        const from = getRegion(p[0]);
+        const to = getRegion(p[1]);
         if (Math.random() > 0.5) {
-            pulses.push({ from: to, to: from, progress: 0, speed: 0.008 + Math.random() * 0.008 });
+            pulses.push({ from: to, to: from, progress: 0, speed: 0.006 + Math.random() * 0.006, color: from.color });
         } else {
-            pulses.push({ from, to, progress: 0, speed: 0.008 + Math.random() * 0.008 });
+            pulses.push({ from, to, progress: 0, speed: 0.006 + Math.random() * 0.006, color: from.color });
         }
     }
 
     function resize() {
         const r = setupCanvas(canvas);
         ctx = r.ctx; w = r.w; h = r.h;
+        // Scale brain to fit canvas with padding
+        const pad = 40;
+        brainScale = Math.min(w - pad * 2, h - pad * 2);
+        brainOffsetX = (w - brainScale) / 2;
+        brainOffsetY = (h - brainScale) / 2;
     }
 
-    function render() {
-        if (!isActive) return;
-        requestAnimationFrame(render);
-        time++;
+    function drawBrainOutline() {
+        const pts = brainOutline.map(p => toCanvas(p));
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) {
+            const prev = pts[i - 1];
+            const curr = pts[i];
+            const cpx = (prev.x + curr.x) / 2;
+            const cpy = (prev.y + curr.y) / 2;
+            ctx.quadraticCurveTo(prev.x, prev.y, cpx, cpy);
+        }
+        // Close back to start
+        const last = pts[pts.length - 1];
+        const first = pts[0];
+        ctx.quadraticCurveTo(last.x, last.y, first.x, first.y);
+        ctx.closePath();
 
-        ctx.clearRect(0, 0, w, h);
+        // Fill with very subtle gradient
+        const cx = brainOffsetX + brainScale * 0.5;
+        const cy = brainOffsetY + brainScale * 0.5;
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, brainScale * 0.5);
+        grad.addColorStop(0, 'rgba(201, 169, 110, 0.04)');
+        grad.addColorStop(1, 'rgba(201, 169, 110, 0.01)');
+        ctx.fillStyle = grad;
+        ctx.fill();
 
-        // Draw connections
-        connections.forEach(([aId, bId]) => {
-            const a = nodePos(getNode(aId));
-            const b = nodePos(getNode(bId));
-            const isHovered = hoveredNode && (hoveredNode.id === aId || hoveredNode.id === bId);
+        ctx.strokeStyle = 'rgba(201, 169, 110, 0.2)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+    }
+
+    function drawSulci() {
+        sulci.forEach(sulcus => {
+            const pts = sulcus.map(p => toCanvas(p));
             ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.strokeStyle = isHovered
-                ? 'rgba(201, 169, 110, 0.35)'
-                : 'rgba(201, 169, 110, 0.08)';
-            ctx.lineWidth = isHovered ? 1.5 : 0.8;
+            ctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 1; i < pts.length; i++) {
+                const prev = pts[i - 1];
+                const curr = pts[i];
+                ctx.quadraticCurveTo(
+                    prev.x + (curr.x - prev.x) * 0.5 + (Math.random() - 0.5) * 2,
+                    prev.y + (curr.y - prev.y) * 0.5 + (Math.random() - 0.5) * 2,
+                    curr.x, curr.y
+                );
+            }
+            ctx.strokeStyle = 'rgba(201, 169, 110, 0.07)';
+            ctx.lineWidth = 1;
             ctx.stroke();
         });
+    }
 
-        // Update and draw pulses
+    function drawNeurons() {
+        neurons.forEach(n => {
+            if (!isInsideBrain(n.x, n.y)) return;
+            const pos = toCanvas(n);
+            const flicker = 0.08 + Math.sin(time * 0.02 + n.phase) * 0.04;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, n.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(201, 169, 110, ${flicker})`;
+            ctx.fill();
+        });
+    }
+
+    function drawPathways() {
+        pathways.forEach(([aId, bId]) => {
+            const a = regionCenter(getRegion(aId));
+            const b = regionCenter(getRegion(bId));
+            const isHovered = hoveredRegion && (hoveredRegion.id === aId || hoveredRegion.id === bId);
+
+            // Draw curved pathway
+            const mx = (a.x + b.x) / 2 + (a.y - b.y) * 0.15;
+            const my = (a.y + b.y) / 2 + (b.x - a.x) * 0.15;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.quadraticCurveTo(mx, my, b.x, b.y);
+            ctx.strokeStyle = isHovered
+                ? 'rgba(201, 169, 110, 0.3)'
+                : 'rgba(201, 169, 110, 0.06)';
+            ctx.lineWidth = isHovered ? 1.5 : 0.7;
+            ctx.stroke();
+        });
+    }
+
+    function drawPulses() {
         pulseTimer++;
-        if (pulseTimer > 30 && pulses.length < 8) {
+        if (pulseTimer > 25 && pulses.length < 10) {
             spawnPulse();
             pulseTimer = 0;
         }
@@ -1915,121 +2095,176 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
         for (let i = pulses.length - 1; i >= 0; i--) {
             const p = pulses[i];
             p.progress += p.speed;
-            if (p.progress > 1) {
-                pulses.splice(i, 1);
-                continue;
-            }
-            const a = nodePos(p.from);
-            const b = nodePos(p.to);
-            const px = a.x + (b.x - a.x) * p.progress;
-            const py = a.y + (b.y - a.y) * p.progress;
-            const alpha = Math.sin(p.progress * Math.PI) * 0.8;
+            if (p.progress > 1) { pulses.splice(i, 1); continue; }
+
+            const a = regionCenter(p.from);
+            const b = regionCenter(p.to);
+            const mx = (a.x + b.x) / 2 + (a.y - b.y) * 0.15;
+            const my = (a.y + b.y) / 2 + (b.x - a.x) * 0.15;
+
+            // Point along quadratic bezier
+            const t = p.progress;
+            const px = (1-t)*(1-t)*a.x + 2*(1-t)*t*mx + t*t*b.x;
+            const py = (1-t)*(1-t)*a.y + 2*(1-t)*t*my + t*t*b.y;
+            const alpha = Math.sin(t * Math.PI) * 0.9;
 
             ctx.beginPath();
-            ctx.arc(px, py, 3, 0, Math.PI * 2);
+            ctx.arc(px, py, 2.5, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(201, 169, 110, ${alpha})`;
             ctx.fill();
 
-            // Glow
+            // Glow trail
             ctx.beginPath();
-            ctx.arc(px, py, 8, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(201, 169, 110, ${alpha * 0.2})`;
+            ctx.arc(px, py, 7, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(201, 169, 110, ${alpha * 0.15})`;
             ctx.fill();
         }
+    }
 
-        // Draw nodes
-        subjects.forEach(node => {
-            const pos = nodePos(node);
-            const isHovered = hoveredNode && hoveredNode.id === node.id;
-            const isKatie = node.id === 'katie';
-            const pulse = isKatie ? 1 + Math.sin(time * 0.03) * 0.12 : 1;
-            const r = node.r * pulse;
+    function drawRegions() {
+        regions.forEach(region => {
+            const center = regionCenter(region);
+            const isHovered = hoveredRegion && hoveredRegion.id === region.id;
+            const rx = region.rx * brainScale;
+            const ry = region.ry * brainScale;
+            const pulse = 1 + Math.sin(time * 0.025 + regions.indexOf(region)) * 0.06;
 
-            // Outer glow
-            const glowR = r + (isHovered ? 15 : 8);
-            const grad = ctx.createRadialGradient(pos.x, pos.y, r * 0.5, pos.x, pos.y, glowR);
-            grad.addColorStop(0, node.color + (isHovered ? '40' : '15'));
-            grad.addColorStop(1, node.color + '00');
+            // Region highlight area
+            const grad = ctx.createRadialGradient(center.x, center.y, 0, center.x, center.y, Math.max(rx, ry) * pulse);
+            if (isHovered) {
+                grad.addColorStop(0, region.color + '35');
+                grad.addColorStop(0.6, region.color + '15');
+                grad.addColorStop(1, region.color + '00');
+            } else {
+                grad.addColorStop(0, region.color + '18');
+                grad.addColorStop(0.6, region.color + '08');
+                grad.addColorStop(1, region.color + '00');
+            }
             ctx.beginPath();
-            ctx.arc(pos.x, pos.y, glowR, 0, Math.PI * 2);
+            ctx.ellipse(center.x, center.y, rx * pulse, ry * pulse, 0, 0, Math.PI * 2);
             ctx.fillStyle = grad;
             ctx.fill();
 
-            // Main circle
+            // Region border
             ctx.beginPath();
-            ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
-            ctx.fillStyle = node.color + (isHovered ? '50' : '20');
-            ctx.strokeStyle = node.color + (isHovered ? 'cc' : '60');
-            ctx.lineWidth = isHovered ? 2 : 1;
-            ctx.fill();
+            ctx.ellipse(center.x, center.y, rx * 0.85, ry * 0.85, 0, 0, Math.PI * 2);
+            ctx.strokeStyle = region.color + (isHovered ? '60' : '25');
+            ctx.lineWidth = isHovered ? 1.5 : 0.8;
+            ctx.setLineDash([3, 4]);
             ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Center dot
+            ctx.beginPath();
+            ctx.arc(center.x, center.y, isHovered ? 4 : 3, 0, Math.PI * 2);
+            ctx.fillStyle = region.color + (isHovered ? 'cc' : '60');
+            ctx.fill();
 
             // Label
-            ctx.font = isKatie ? "500 11px 'DM Sans', sans-serif" : "400 9px 'Space Mono', monospace";
+            const fontSize = isHovered ? 10 : 8;
+            ctx.font = `400 ${fontSize}px 'Space Mono', monospace`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillStyle = isHovered ? '#ffffff' : (node.color + 'cc');
-            ctx.fillText(isKatie ? 'KATIE' : node.label.toUpperCase(), pos.x, pos.y);
+            ctx.fillStyle = isHovered ? '#ffffff' : (region.color + 'bb');
+            ctx.fillText(region.label.toUpperCase(), center.x, center.y - (isHovered ? 16 : 13));
+
+            // Lobe name (smaller, below)
+            if (isHovered) {
+                ctx.font = "300 8px 'DM Sans', sans-serif";
+                ctx.fillStyle = region.color + '90';
+                ctx.fillText(region.lobe, center.x, center.y + 16);
+            }
         });
+    }
+
+    function render() {
+        if (!isActive) return;
+        requestAnimationFrame(render);
+        time++;
+        ctx.clearRect(0, 0, w, h);
+
+        drawBrainOutline();
+        drawSulci();
+        drawNeurons();
+        drawPathways();
+        drawPulses();
+        drawRegions();
     }
 
     resize();
     window.addEventListener('resize', resize);
+
+    // Hit test for regions
+    function hitTest(mx, my) {
+        let found = null;
+        regions.forEach(region => {
+            const center = regionCenter(region);
+            const rx = region.rx * brainScale;
+            const ry = region.ry * brainScale;
+            const dx = (mx - center.x) / rx;
+            const dy = (my - center.y) / ry;
+            if (dx * dx + dy * dy < 1.2) found = region;
+        });
+        return found;
+    }
+
+    function showTooltip(region, px, py) {
+        tooltipTitle.textContent = region.label;
+        tooltipDesc.textContent = region.lobe + ' — ' + region.desc;
+        tooltip.style.opacity = '1';
+        // Position tooltip, keeping it in bounds
+        let tx = px + 20;
+        let ty = py - 30;
+        if (tx + 200 > w) tx = px - 220;
+        if (ty < 10) ty = py + 20;
+        tooltip.style.left = tx + 'px';
+        tooltip.style.top = ty + 'px';
+    }
 
     // Hover detection
     canvas.addEventListener('mousemove', e => {
         const rect = canvas.getBoundingClientRect();
         const mx = e.clientX - rect.left;
         const my = e.clientY - rect.top;
-        let found = null;
+        const found = hitTest(mx, my);
 
-        subjects.forEach(node => {
-            const pos = nodePos(node);
-            const dist = Math.hypot(mx - pos.x, my - pos.y);
-            if (dist < node.r + 10) found = node;
-        });
-
-        hoveredNode = found;
+        hoveredRegion = found;
         canvas.style.cursor = found ? 'pointer' : 'default';
 
         if (found) {
-            tooltipTitle.textContent = found.label;
-            tooltipDesc.textContent = found.desc;
-            tooltip.style.opacity = '1';
-            tooltip.style.left = (nodePos(found).x + found.r + 15) + 'px';
-            tooltip.style.top = (nodePos(found).y - 20) + 'px';
+            showTooltip(found, mx, my);
         } else {
             tooltip.style.opacity = '0';
         }
     });
 
     canvas.addEventListener('mouseleave', () => {
-        hoveredNode = null;
+        hoveredRegion = null;
         tooltip.style.opacity = '0';
     });
 
     // Touch support
     canvas.addEventListener('touchstart', e => {
+        e.preventDefault();
         const rect = canvas.getBoundingClientRect();
         const touch = e.touches[0];
         const mx = touch.clientX - rect.left;
         const my = touch.clientY - rect.top;
-        let found = null;
-        subjects.forEach(node => {
-            const pos = nodePos(node);
-            if (Math.hypot(mx - pos.x, my - pos.y) < node.r + 15) found = node;
-        });
-        hoveredNode = found;
-        if (found) {
-            tooltipTitle.textContent = found.label;
-            tooltipDesc.textContent = found.desc;
-            tooltip.style.opacity = '1';
-            tooltip.style.left = (nodePos(found).x + found.r + 15) + 'px';
-            tooltip.style.top = (nodePos(found).y - 20) + 'px';
-        } else {
+        const found = hitTest(mx, my);
+
+        if (found && hoveredRegion && hoveredRegion.id === found.id) {
+            // Second tap on same region — deselect
+            hoveredRegion = null;
             tooltip.style.opacity = '0';
+        } else {
+            hoveredRegion = found;
+            if (found) {
+                showTooltip(found, mx, my);
+            } else {
+                tooltip.style.opacity = '0';
+            }
         }
-    });
+    }, { passive: false });
 
     // ScrollTrigger: activate when in view
     ScrollTrigger.create({
