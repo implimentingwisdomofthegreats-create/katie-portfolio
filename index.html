@@ -2407,43 +2407,46 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
     resize();
     window.addEventListener('resize', resize);
 
-    ScrollTrigger.create({
-        trigger: '#gpaSection',
-        start: 'top top',
-        end: '+=150%',
-        pin: true,
-        anticipatePin: 1,
-        scrub: 1,
-        onUpdate: (self) => {
-            plotProgress = self.progress;
-            if (self.progress > 0.85) {
-                reveal.classList.add('visible');
-            } else {
-                reveal.classList.remove('visible');
+    // Defer creation — must run after brain's deferred trigger creates its
+    // 500% pin spacer, otherwise this section's position is calculated too high.
+    requestAnimationFrame(() => {
+        ScrollTrigger.create({
+            trigger: '#gpaSection',
+            start: 'top top',
+            end: '+=150%',
+            pin: true,
+            scrub: 1,
+            onUpdate: (self) => {
+                plotProgress = self.progress;
+                if (self.progress > 0.85) {
+                    reveal.classList.add('visible');
+                } else {
+                    reveal.classList.remove('visible');
+                }
+            },
+            onEnter: () => {
+                isActive = true;
+                const el = document.getElementById('gpaSection');
+                el.style.visibility = 'visible';
+                gsap.to(el, { opacity: 1, duration: 0.8, ease: 'power2.out' });
+                render();
+            },
+            onLeave: () => { isActive = false; },
+            onEnterBack: () => {
+                isActive = true;
+                const el = document.getElementById('gpaSection');
+                el.style.visibility = 'visible';
+                gsap.set(el, { opacity: 1 });
+                render();
+            },
+            onLeaveBack: () => {
+                isActive = false;
+                const el = document.getElementById('gpaSection');
+                gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => {
+                    el.style.visibility = 'hidden';
+                }});
             }
-        },
-        onEnter: () => {
-            isActive = true;
-            const el = document.getElementById('gpaSection');
-            el.style.visibility = 'visible';
-            gsap.to(el, { opacity: 1, duration: 0.8, ease: 'power2.out' });
-            render();
-        },
-        onLeave: () => { isActive = false; },
-        onEnterBack: () => {
-            isActive = true;
-            const el = document.getElementById('gpaSection');
-            el.style.visibility = 'visible';
-            gsap.set(el, { opacity: 1 });
-            render();
-        },
-        onLeaveBack: () => {
-            isActive = false;
-            const el = document.getElementById('gpaSection');
-            gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => {
-                el.style.visibility = 'hidden';
-            }});
-        }
+        });
     });
 })();
 
@@ -2536,6 +2539,7 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
     resize();
     window.addEventListener('resize', resize);
 
+    requestAnimationFrame(() => {
     ScrollTrigger.create({
         trigger: '#spiralSection',
         start: 'top 80%',
@@ -2546,6 +2550,7 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
         onLeave: () => { isActive = false; },
         onEnterBack: () => { isActive = true; render(); },
         onLeaveBack: () => { isActive = false; }
+    });
     });
 })();
 
@@ -2743,6 +2748,7 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
     resize();
     window.addEventListener('resize', () => { resize(); hasFired = false; });
 
+    requestAnimationFrame(() => {
     ScrollTrigger.create({
         trigger: '#finaleSection',
         start: 'top 60%',
@@ -2758,6 +2764,7 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
             render();
         },
         onLeaveBack: () => { isActive = false; }
+    });
     });
 })();
 </script>
