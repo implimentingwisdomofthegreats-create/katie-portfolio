@@ -433,6 +433,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            opacity: 0;
+            will-change: opacity;
         }
 
         .brain-canvas-wrap {
@@ -586,6 +588,8 @@
             position: relative;
             padding: 60px 24px;
             text-align: center;
+            opacity: 0;
+            will-change: opacity;
         }
 
         .cell-canvas-wrap {
@@ -642,6 +646,8 @@
             position: relative;
             padding: 60px 24px;
             text-align: center;
+            opacity: 0;
+            will-change: opacity;
         }
 
         .gpa-canvas-wrap {
@@ -1264,7 +1270,6 @@
            MOBILE
            ═══════════════════════════════════════════════ */
         @media (max-width: 768px) {
-            /* brain section handled by Three.js */
             .cell-canvas-wrap { height: 280px; }
             .gpa-canvas-wrap { height: 300px; }
             .genome-ticker { display: none; }
@@ -1272,12 +1277,64 @@
             .math-symbol:nth-child(n+8) { display: none; }
             .synapse-stats { gap: 16px; }
             .math-notation { gap: 20px; }
+
+            /* Spacing */
+            .spacer { height: 20vh; }
+            .spacer-sm { height: 10vh; }
+            .screen { padding: 40px 20px; }
+            .quote-section { padding: 100px 20px; }
+
+            /* Subject cards */
+            .subject-card { width: min(360px, 90vw); }
+            .buzzword { font-size: 0.5rem; padding: 4px 10px; }
+
+            /* Touch-friendly DNA game targets */
+            .dna-palette-btn { width: 56px; height: 56px; }
+            .dna-base { width: 40px; height: 40px; }
+
+            /* Section spacing */
+            .start-section { padding: 80px 20px; }
+            .start-stats { gap: 16px; }
+            .start-stat { padding: 20px 12px; }
+            .boba-section { padding: 80px 20px; }
+            .finale { padding: 60px 20px; }
+            .finale-sub { font-size: 0.9rem; }
+
+            /* Brain header on mobile */
+            .brain-header .studies-title { font-size: clamp(1.8rem, 5vw, 3rem); }
         }
 
         @media (max-width: 480px) {
-            /* brain section handled by Three.js */
             .cell-canvas-wrap { height: 240px; }
             .gpa-canvas-wrap { height: 250px; }
+
+            .spacer { height: 15vh; }
+            .spacer-sm { height: 8vh; }
+            .quote-section { padding: 80px 16px; }
+
+            .subject-card { width: min(300px, 92vw); padding: 20px 16px; }
+            .subject-card-name { font-size: clamp(1.6rem, 5vw, 2.4rem); }
+            .subject-card-fact { font-size: 0.75rem; }
+
+            .dna-base { width: 36px; height: 36px; font-size: 0.8rem; }
+            .dna-palette-btn { width: 50px; height: 50px; font-size: 1rem; }
+            .dna-game-hint { font-size: 0.7rem; }
+
+            .start-acronym { gap: 6px; }
+            .start-letter { font-size: 0.6rem; padding: 5px 10px; }
+            .start-desc { font-size: 0.85rem; }
+
+            .finale-declaration { font-size: clamp(2.5rem, 8vw, 6rem); }
+            .synapse-stat { font-size: 0.65rem; letter-spacing: 1px; }
+
+            .big-number { font-size: clamp(4rem, 14vw, 10rem); }
+            .big-number-context { font-size: 0.8rem; }
+
+            .hero-sub { font-size: 0.85rem; }
+            .hero-tagline { font-size: 0.6rem; }
+
+            .brain-header .studies-title { font-size: clamp(1.5rem, 4.5vw, 2.5rem); }
+            .brain-finale-text p { font-size: clamp(0.95rem, 2.2vw, 1.3rem); }
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1723,15 +1780,24 @@ window.addEventListener('load', () => {
         document.getElementById('preloader').classList.add('hidden');
         ScrollTrigger.refresh();
     }, 1400);
+    // Second refresh after layout fully settles (fonts, pin spacers)
+    setTimeout(() => ScrollTrigger.refresh(), 1800);
 });
 
 // ═══════════════════════════════════════════════════════
 // PROGRESS BAR
 // ═══════════════════════════════════════════════════════
+const progressBarEl = document.getElementById('progressBar');
+let progressRafPending = false;
 window.addEventListener('scroll', () => {
-    const progress = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-    document.getElementById('progressBar').style.width = progress + '%';
-});
+    if (progressRafPending) return;
+    progressRafPending = true;
+    requestAnimationFrame(() => {
+        const progress = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+        progressBarEl.style.width = progress + '%';
+        progressRafPending = false;
+    });
+}, { passive: true });
 
 // ═══════════════════════════════════════════════════════
 // SCROLL REVEAL (IntersectionObserver for fade-elements)
@@ -1790,13 +1856,19 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
     }
 
     const mathSymbols = container.querySelectorAll('.math-symbol');
+    let mathRafPending = false;
     window.addEventListener('scroll', () => {
-        const sy = window.scrollY;
-        mathSymbols.forEach(s => {
-            const speed = parseFloat(s.dataset.speed);
-            s.style.transform = `translateY(${-sy * speed}px)`;
+        if (mathRafPending) return;
+        mathRafPending = true;
+        requestAnimationFrame(() => {
+            const sy = window.scrollY;
+            mathSymbols.forEach(s => {
+                const speed = parseFloat(s.dataset.speed);
+                s.style.transform = `translateY(${-sy * speed}px)`;
+            });
+            mathRafPending = false;
         });
-    });
+    }, { passive: true });
 })();
 
 // ═══════════════════════════════════════════════════════
@@ -2262,17 +2334,42 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
     resize();
     window.addEventListener('resize', resize);
 
+    // Pre-render the brain at initial state so the canvas has content for the fade-in
+    brainWire.rotation.y = 0.5;
+    brainPoints.rotation.y = 0.5;
+    brainWire.rotation.x = 0;
+    brainPoints.rotation.x = 0;
+    header.style.opacity = '1';
+    finaleText.style.opacity = '0';
+    regionMeshes.forEach(rm => { rm.mat.opacity = 0.05; rm.coreMat.opacity = 0.1; });
+    renderer.render(scene, camera);
+
+    const brainEl = document.getElementById('brainSection');
+
     ScrollTrigger.create({
         trigger: '#brainSection',
         start: 'top top',
         end: '+=500%',
         pin: true,
+        anticipatePin: 1,
         scrub: 1,
         onUpdate: (self) => { scrollProgress = self.progress; },
-        onEnter: () => { isActive = true; render(); },
+        onEnter: () => {
+            isActive = true;
+            gsap.to(brainEl, { opacity: 1, duration: 0.8, ease: 'power2.out' });
+            render();
+        },
         onLeave: () => { isActive = false; cancelAnimationFrame(animFrame); },
-        onEnterBack: () => { isActive = true; render(); },
-        onLeaveBack: () => { isActive = false; cancelAnimationFrame(animFrame); }
+        onEnterBack: () => {
+            isActive = true;
+            gsap.set(brainEl, { opacity: 1 });
+            render();
+        },
+        onLeaveBack: () => {
+            isActive = false;
+            cancelAnimationFrame(animFrame);
+            gsap.to(brainEl, { opacity: 0, duration: 0.3 });
+        }
     });
 })();
 
@@ -2310,9 +2407,13 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
         return cells;
     }
 
+    let cachedCount = -1;
+    let cachedCells = [];
+
     function resize() {
         const r = setupCanvas(canvas);
         ctx = r.ctx; w = r.w; h = r.h;
+        cachedCount = -1; // Force recompute on resize
     }
 
     function drawCell(x, y, rx, ry, color, time, divisionPhase) {
@@ -2366,8 +2467,13 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
 
         cellNumber.textContent = count;
 
-        const cells = getCellPositions(count, w, h);
-        cells.forEach(cell => {
+        // Only recompute positions when count changes (prevents random jitter)
+        if (count !== cachedCount) {
+            cachedCount = count;
+            cachedCells = getCellPositions(count, w, h);
+        }
+
+        cachedCells.forEach(cell => {
             drawCell(cell.x, cell.y, cell.rx, cell.ry, cell.color, frame, 0);
         });
     }
@@ -2380,12 +2486,24 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
         start: 'top top',
         end: '+=150%',
         pin: true,
+        anticipatePin: 1,
         scrub: 1,
         onUpdate: (self) => { cellProgress = self.progress; },
-        onEnter: () => { isActive = true; render(); },
+        onEnter: () => {
+            isActive = true;
+            gsap.to('#cellSection', { opacity: 1, duration: 0.8, ease: 'power2.out' });
+            render();
+        },
         onLeave: () => { isActive = false; },
-        onEnterBack: () => { isActive = true; render(); },
-        onLeaveBack: () => { isActive = false; }
+        onEnterBack: () => {
+            isActive = true;
+            gsap.set('#cellSection', { opacity: 1 });
+            render();
+        },
+        onLeaveBack: () => {
+            isActive = false;
+            gsap.to('#cellSection', { opacity: 0, duration: 0.3 });
+        }
     });
 })();
 
@@ -2533,6 +2651,7 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
         start: 'top top',
         end: '+=150%',
         pin: true,
+        anticipatePin: 1,
         scrub: 1,
         onUpdate: (self) => {
             plotProgress = self.progress;
@@ -2542,10 +2661,21 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
                 reveal.classList.remove('visible');
             }
         },
-        onEnter: () => { isActive = true; render(); },
+        onEnter: () => {
+            isActive = true;
+            gsap.to('#gpaSection', { opacity: 1, duration: 0.8, ease: 'power2.out' });
+            render();
+        },
         onLeave: () => { isActive = false; },
-        onEnterBack: () => { isActive = true; render(); },
-        onLeaveBack: () => { isActive = false; }
+        onEnterBack: () => {
+            isActive = true;
+            gsap.set('#gpaSection', { opacity: 1 });
+            render();
+        },
+        onLeaveBack: () => {
+            isActive = false;
+            gsap.to('#gpaSection', { opacity: 0, duration: 0.3 });
+        }
     });
 })();
 
