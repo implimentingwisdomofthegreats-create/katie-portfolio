@@ -1,0 +1,2774 @@
+{% verbatim %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katie.</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Space+Mono&display=swap');
+
+        :root {
+            --black: #000000;
+            --off-black: #0a0a0a;
+            --dark: #111111;
+            --mid: #1a1a1a;
+            --gray-dark: #333333;
+            --gray: #666666;
+            --gray-light: #999999;
+            --silver: #cccccc;
+            --off-white: #f5f5f7;
+            --white: #ffffff;
+            --warm: #c9a96e;
+            --warm-light: #e8d5a8;
+            --warm-glow: rgba(201, 169, 110, 0.08);
+            --red-soft: #d4736c;
+            --base-a: #4ecdc4;
+            --base-t: #ff6b6b;
+            --base-g: #c9a96e;
+            --base-c: #a8e6cf;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: auto; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--black);
+            color: var(--white);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            background: var(--warm);
+            color: var(--black);
+        }
+
+        /* ═══════════════════════════════════════════════
+           UTILITY
+           ═══════════════════════════════════════════════ */
+        .screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 60px 24px;
+        }
+
+        .fade-element {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .fade-element.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .fade-element.delay-1 { transition-delay: 0.15s; }
+        .fade-element.delay-2 { transition-delay: 0.3s; }
+        .fade-element.delay-3 { transition-delay: 0.45s; }
+        .fade-element.delay-4 { transition-delay: 0.6s; }
+        .fade-element.delay-5 { transition-delay: 0.75s; }
+
+        .label {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 400;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gray);
+        }
+
+        .divider {
+            width: 40px;
+            height: 1px;
+            background: var(--gray-dark);
+            margin: 32px auto;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            border: 0;
+        }
+
+        /* ═══════════════════════════════════════════════
+           PRELOADER
+           ═══════════════════════════════════════════════ */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: var(--black);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .preloader-text {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            color: var(--gray-light);
+            letter-spacing: 0.02em;
+        }
+
+        .preloader-dna {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .preloader-dna span {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            opacity: 0;
+            animation: preloaderBase 1.2s ease forwards;
+        }
+
+        @keyframes preloaderBase {
+            to { opacity: 0.6; }
+        }
+
+        /* ═══════════════════════════════════════════════
+           PROGRESS BAR
+           ═══════════════════════════════════════════════ */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: var(--warm);
+            z-index: 100;
+            width: 0%;
+        }
+
+        /* ═══════════════════════════════════════════════
+           GENOME TICKER
+           ═══════════════════════════════════════════════ */
+        .genome-ticker {
+            position: fixed;
+            top: 2px;
+            left: 0;
+            right: 0;
+            height: 16px;
+            overflow: hidden;
+            z-index: 99;
+            opacity: 0.35;
+            pointer-events: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 8px;
+            letter-spacing: 3px;
+            line-height: 16px;
+            white-space: nowrap;
+        }
+
+        .genome-ticker-track {
+            display: inline-block;
+            animation: tickerScroll 120s linear infinite;
+        }
+
+        .genome-ticker .ba { color: var(--base-a); }
+        .genome-ticker .bt { color: var(--base-t); }
+        .genome-ticker .bg { color: var(--base-g); }
+        .genome-ticker .bc { color: var(--base-c); }
+
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ═══════════════════════════════════════════════
+           HERO + DNA CANVAS
+           ═══════════════════════════════════════════════ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #dnaCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .hero-name {
+            font-family: 'Instrument Serif', serif;
+            font-weight: 400;
+            font-size: clamp(5rem, 15vw, 14rem);
+            letter-spacing: -0.03em;
+            line-height: 0.9;
+            opacity: 0;
+            animation: heroReveal 1.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+        }
+
+        .hero-period { color: var(--warm); }
+
+        .hero-sub {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+            color: var(--gray);
+            margin-top: 24px;
+            letter-spacing: 0.04em;
+            opacity: 0;
+            animation: heroReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) 1.2s forwards;
+        }
+
+        .hero-tagline {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--warm);
+            margin-top: 16px;
+            opacity: 0;
+            animation: heroReveal 1.2s ease 1.6s forwards;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 48px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            animation: heroReveal 1s ease 2.2s forwards;
+            z-index: 1;
+        }
+
+        .scroll-indicator .label {
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 48px;
+            position: relative;
+            overflow: hidden;
+            background: var(--gray-dark);
+        }
+
+        .scroll-line::after {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--warm);
+            animation: scrollDown 2s ease-in-out infinite;
+        }
+
+        @keyframes heroReveal {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scrollDown {
+            0% { top: -100%; }
+            50% { top: 100%; }
+            100% { top: 100%; }
+        }
+
+        /* ═══════════════════════════════════════════════
+           SPACER
+           ═══════════════════════════════════════════════ */
+        .spacer { height: 30vh; }
+        .spacer-sm { height: 15vh; }
+
+        /* ═══════════════════════════════════════════════
+           FLOATING MATH SYMBOLS
+           ═══════════════════════════════════════════════ */
+        .math-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .math-symbol {
+            position: absolute;
+            font-family: 'Space Mono', monospace;
+            color: rgba(201, 169, 110, 0.04);
+            font-size: 2rem;
+            user-select: none;
+            will-change: transform;
+        }
+
+        /* ═══════════════════════════════════════════════
+           THE DISTANCE
+           ═══════════════════════════════════════════════ */
+        .distance-section {
+            padding: 0 24px;
+            text-align: center;
+        }
+
+        .distance-context {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(1rem, 1.8vw, 1.25rem);
+            color: var(--gray);
+            max-width: 480px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .distance-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(4rem, 12vw, 10rem);
+            letter-spacing: -0.04em;
+            line-height: 1;
+            margin: 40px 0 16px;
+            color: var(--white);
+        }
+
+        .distance-unit {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            color: var(--gray-light);
+            letter-spacing: 0.1em;
+            text-transform: lowercase;
+        }
+
+        .route-container {
+            width: 100%;
+            max-width: 600px;
+            height: 120px;
+            margin: 48px auto 0;
+            position: relative;
+        }
+
+        .route-container svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .route-labels {
+            display: flex;
+            justify-content: space-between;
+            max-width: 600px;
+            margin: 12px auto 0;
+        }
+
+        .route-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .route-label.origin { color: var(--warm); }
+        .route-label.dest { color: var(--white); }
+
+        /* ═══════════════════════════════════════════════
+           QUOTE / BRIDGE
+           ═══════════════════════════════════════════════ */
+        .quote-section {
+            text-align: center;
+            padding: 160px 24px;
+        }
+
+        .quote-text {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(1.3rem, 3vw, 2.2rem);
+            font-weight: 400;
+            line-height: 1.7;
+            max-width: 680px;
+            margin: 0 auto;
+            color: var(--silver);
+        }
+
+        .quote-text .em {
+            color: var(--white);
+            font-style: italic;
+        }
+
+        /* ═══════════════════════════════════════════════
+           3D BRAIN — SUBJECTS
+           ═══════════════════════════════════════════════ */
+        .brain-section {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .brain-canvas-wrap {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        #brainCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .brain-overlay {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 900px;
+            padding: 0 24px;
+            pointer-events: none;
+        }
+
+        .brain-header {
+            text-align: center;
+            transition: opacity 0.5s;
+        }
+
+        .brain-header .studies-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .brain-header .studies-title em {
+            font-style: italic;
+            color: var(--warm);
+        }
+
+        /* brain-finale-text removed */
+
+        /* Subject Cards */
+        .subject-card {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            text-align: center;
+            z-index: 5;
+            pointer-events: none;
+            width: min(420px, 85vw);
+            padding: 36px 32px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid rgba(201, 169, 110, 0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .subject-card-region {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gray);
+            margin-bottom: 12px;
+        }
+
+        .subject-card-name {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+
+        .subject-card-fact {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(0.8rem, 1.3vw, 0.95rem);
+            color: var(--gray-light);
+            line-height: 1.7;
+            max-width: 380px;
+            margin: 0 auto 20px;
+        }
+
+        .subject-card-buzzwords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .buzzword {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.55rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            border: 1px solid rgba(201, 169, 110, 0.2);
+            border-radius: 20px;
+            color: var(--gray);
+            opacity: 0;
+            transform: translateY(8px);
+            transition: opacity 0.3s, transform 0.3s, color 0.3s, border-color 0.3s;
+        }
+
+        .buzzword.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .subject-card {
+                padding: 24px 20px;
+            }
+            .subject-card-fact {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* ═══════════════════════════════════════════════
+           CELL DIVISION — WORKLOAD
+           ═══════════════════════════════════════════════ */
+        .cell-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 60px 24px;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .cell-canvas-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 350px;
+            margin: 30px auto;
+        }
+
+        #cellCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .big-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(5rem, 16vw, 14rem);
+            line-height: 0.85;
+            letter-spacing: -0.05em;
+            color: var(--white);
+            position: relative;
+        }
+
+        .big-number-label {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            color: var(--gray-light);
+            margin-top: 16px;
+            letter-spacing: 0.04em;
+        }
+
+        .big-number-context {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(0.85rem, 1.3vw, 1rem);
+            color: var(--gray);
+            max-width: 400px;
+            margin: 20px auto 0;
+            line-height: 1.7;
+        }
+
+        /* ═══════════════════════════════════════════════
+           GPA — FUNCTION PLOT
+           ═══════════════════════════════════════════════ */
+        .gpa-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 60px 24px;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .gpa-canvas-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            height: 400px;
+            margin: 30px auto;
+        }
+
+        #gpaCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .gpa-number { color: var(--warm); }
+
+        .gpa-big-reveal {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(5rem, 16vw, 14rem);
+            color: var(--warm);
+            letter-spacing: -0.05em;
+            line-height: 0.85;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .gpa-big-reveal.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .math-notation {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .equation {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--warm);
+            opacity: 0.6;
+            letter-spacing: 1px;
+        }
+
+        /* ═══════════════════════════════════════════════
+           START RESEARCH PROGRAM
+           ═══════════════════════════════════════════════ */
+        .start-section {
+            padding: 120px 24px;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .start-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .start-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .start-title em {
+            font-style: italic;
+            color: var(--warm);
+        }
+
+        .start-acronym {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .start-letter {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            padding: 6px 12px;
+            border: 1px solid rgba(201, 169, 110, 0.2);
+            border-radius: 4px;
+            color: var(--gray-light);
+            text-transform: uppercase;
+        }
+
+        .start-letter strong {
+            color: var(--warm);
+            font-weight: 700;
+        }
+
+        .start-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 24px;
+            margin: 48px 0;
+        }
+
+        .start-stat {
+            text-align: center;
+            padding: 24px 16px;
+            border: 1px solid rgba(201, 169, 110, 0.1);
+            border-radius: 8px;
+            background: rgba(201, 169, 110, 0.02);
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        .start-stat:hover {
+            border-color: rgba(201, 169, 110, 0.3);
+            background: rgba(201, 169, 110, 0.05);
+        }
+
+        .start-stat-number {
+            font-family: 'Instrument Serif', serif;
+            font-size: 2rem;
+            color: var(--warm);
+            line-height: 1;
+        }
+
+        .start-stat-label {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .start-desc {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+            color: var(--gray-light);
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .start-techniques {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 32px;
+        }
+
+        .tech-tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 1px;
+            padding: 5px 10px;
+            border: 1px solid rgba(201, 169, 110, 0.15);
+            border-radius: 20px;
+            color: var(--gray);
+            text-transform: uppercase;
+            transition: color 0.3s, border-color 0.3s;
+        }
+
+        .tech-tag:hover {
+            color: var(--warm);
+            border-color: var(--warm);
+        }
+
+        /* DNA game removed */
+
+        /* ═══════════════════════════════════════════════
+           GOLDEN SPIRAL — FUTURE
+           ═══════════════════════════════════════════════ */
+        .spiral-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 80px 24px;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .spiral-canvas-wrap {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        #spiralCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .spiral-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .spiral-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 400;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .spiral-sub {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            color: var(--gray-light);
+            margin-top: 20px;
+            letter-spacing: 0.02em;
+        }
+
+        .spiral-sub .highlight {
+            color: var(--warm);
+            font-weight: 400;
+        }
+
+        .spiral-context {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: clamp(0.85rem, 1.3vw, 1rem);
+            color: var(--gray);
+            max-width: 450px;
+            margin: 24px auto 0;
+            line-height: 1.7;
+        }
+
+        /* ═══════════════════════════════════════════════
+           BOBA — MOLECULAR
+           ═══════════════════════════════════════════════ */
+        .boba-section {
+            text-align: center;
+            padding: 120px 24px;
+            position: relative;
+        }
+
+        .boba-pearls {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .pearl {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--warm);
+            opacity: 0;
+            animation: floatPearl var(--duration, 6s) ease-in-out var(--delay, 0s) infinite;
+        }
+
+        @keyframes floatPearl {
+            0% { opacity: 0; transform: translateY(20px) scale(0.8); }
+            20% { opacity: 0.15; }
+            80% { opacity: 0.15; }
+            100% { opacity: 0; transform: translateY(-60px) scale(0.6); }
+        }
+
+        .boba-icon {
+            width: 160px;
+            height: 160px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .boba-cup { width: 100%; height: 100%; }
+
+        .boba-cup .boba-pearl-interactive {
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .boba-text {
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+            color: var(--off-white);
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* boba formula/aside removed */
+
+        /* ═══════════════════════════════════════════════
+           FINALE — SYNAPSE LIGHTNING
+           ═══════════════════════════════════════════════ */
+        .finale {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 80px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #synapseCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .finale-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .synapse-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+            margin: 24px 0 40px;
+        }
+
+        .synapse-stat {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--warm);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .synapse-stat.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .finale-declaration {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(3rem, 9vw, 8rem);
+            font-weight: 400;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            position: relative;
+        }
+
+        .finale-sub {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: 1rem;
+            color: var(--gray);
+            margin-top: 32px;
+            max-width: 460px;
+            line-height: 1.8;
+        }
+
+        .finale-signature {
+            margin-top: 60px;
+            font-family: 'Instrument Serif', serif;
+            font-style: italic;
+            font-size: 1.1rem;
+            color: var(--warm);
+        }
+
+        /* ═══════════════════════════════════════════════
+           CURSOR TRAIL
+           ═══════════════════════════════════════════════ */
+        .cursor-dot {
+            position: fixed;
+            border-radius: 50%;
+            background: var(--warm);
+            pointer-events: none;
+            z-index: 9998;
+            box-shadow: 0 0 6px rgba(201, 169, 110, 0.4);
+            mix-blend-mode: screen;
+        }
+
+        /* ═══════════════════════════════════════════════
+           FOOTER
+           ═══════════════════════════════════════════════ */
+        .footer {
+            text-align: center;
+            padding: 60px 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .footer p {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: 0.75rem;
+            color: var(--gray-dark);
+            letter-spacing: 1px;
+        }
+
+        /* ═══════════════════════════════════════════════
+           GRAIN OVERLAY
+           ═══════════════════════════════════════════════ */
+        .grain {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 256px 256px;
+        }
+
+        /* ═══════════════════════════════════════════════
+           MOBILE
+           ═══════════════════════════════════════════════ */
+        @media (max-width: 768px) {
+            .cell-canvas-wrap { height: 280px; }
+            .gpa-canvas-wrap { height: 300px; }
+            .genome-ticker { display: none; }
+            .cursor-dot { display: none; }
+            .math-symbol:nth-child(n+8) { display: none; }
+            .synapse-stats { gap: 16px; }
+            .math-notation { gap: 20px; }
+
+            /* Spacing */
+            .spacer { height: 20vh; }
+            .spacer-sm { height: 10vh; }
+            .screen { padding: 40px 20px; }
+            .quote-section { padding: 100px 20px; }
+
+            /* Subject cards */
+            .subject-card { width: min(360px, 90vw); }
+            .buzzword { font-size: 0.5rem; padding: 4px 10px; }
+
+
+            /* Section spacing */
+            .start-section { padding: 80px 20px; }
+            .start-stats { gap: 16px; }
+            .start-stat { padding: 20px 12px; }
+            .boba-section { padding: 80px 20px; }
+            .finale { padding: 60px 20px; }
+            .finale-sub { font-size: 0.9rem; }
+
+            /* Brain header on mobile */
+            .brain-header .studies-title { font-size: clamp(1.8rem, 5vw, 3rem); }
+        }
+
+        @media (max-width: 480px) {
+            .cell-canvas-wrap { height: 240px; }
+            .gpa-canvas-wrap { height: 250px; }
+
+            .spacer { height: 15vh; }
+            .spacer-sm { height: 8vh; }
+            .quote-section { padding: 80px 16px; }
+
+            .subject-card { width: min(300px, 92vw); padding: 20px 16px; }
+            .subject-card-name { font-size: clamp(1.6rem, 5vw, 2.4rem); }
+            .subject-card-fact { font-size: 0.75rem; }
+
+
+            .start-acronym { gap: 6px; }
+            .start-letter { font-size: 0.6rem; padding: 5px 10px; }
+            .start-desc { font-size: 0.85rem; }
+
+            .finale-declaration { font-size: clamp(2.5rem, 8vw, 6rem); }
+            .synapse-stat { font-size: 0.65rem; letter-spacing: 1px; }
+
+            .big-number { font-size: clamp(4rem, 14vw, 10rem); }
+            .big-number-context { font-size: 0.8rem; }
+
+            .hero-sub { font-size: 0.85rem; }
+            .hero-tagline { font-size: 0.6rem; }
+
+            .brain-header .studies-title { font-size: clamp(1.5rem, 4.5vw, 2.5rem); }
+            .brain-finale-text p { font-size: clamp(0.95rem, 2.2vw, 1.3rem); }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.7/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+<!-- Film grain overlay -->
+<div class="grain"></div>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Genome ticker -->
+<div class="genome-ticker" id="genomeTicker">
+    <div class="genome-ticker-track" id="genomeTrack"></div>
+</div>
+
+<!-- Floating math symbols -->
+<div class="math-bg" id="mathBg" aria-hidden="true"></div>
+
+<!-- Preloader -->
+<div id="preloader">
+    <span class="preloader-text">A story told in code</span>
+    <div class="preloader-dna" id="preloaderDna"></div>
+</div>
+
+<!-- ═══════════ HERO — DNA HELIX ═══════════ -->
+<section class="hero" id="heroSection">
+    <canvas id="dnaCanvas"></canvas>
+    <div class="hero-content">
+        <h1 class="hero-name">Katie<span class="hero-period">.</span></h1>
+        <p class="hero-sub">A story of distance, dedication, and extraordinary brilliance</p>
+        <p class="hero-tagline">Biology · Neuroscience · Mathematics</p>
+    </div>
+    <div class="scroll-indicator">
+        <span class="label">Scroll</span>
+        <div class="scroll-line"></div>
+    </div>
+</section>
+
+<!-- ═══════════ CHAPTER 1: THE DISTANCE ═══════════ -->
+<div class="spacer"></div>
+
+<section class="screen distance-section" id="distanceSection">
+    <p class="distance-context fade-element">She left everything she knew.</p>
+    <div class="distance-context fade-element delay-1" style="margin-top: 12px;">
+        Packed her life into suitcases, said goodbye to her family, and boarded a flight that would carry her
+    </div>
+    <div class="distance-number">
+        <span id="distanceCounter">0</span>
+    </div>
+    <div class="distance-unit fade-element delay-3">miles from home</div>
+    <div class="route-container" id="routeContainer">
+        <svg id="routeSvg" viewBox="0 0 600 100" fill="none" preserveAspectRatio="xMidYMid meet">
+            <defs>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="4" result="blur"/>
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+            </defs>
+            <path id="flightPathBg" d="M 40 70 C 140 10, 300 5, 400 45 C 480 75, 540 35, 565 25"
+                  stroke="rgba(201,169,110,0.1)" stroke-width="1" fill="none" stroke-dasharray="4 6"/>
+            <path id="flightPathDrawn" d="M 40 70 C 140 10, 300 5, 400 45 C 480 75, 540 35, 565 25"
+                  stroke="rgba(201,169,110,0.5)" stroke-width="1.5" fill="none"/>
+            <circle cx="40" cy="70" r="4" fill="#c9a96e" opacity="0.8"/>
+            <circle cx="565" cy="25" r="4" fill="#ffffff" opacity="0"/>
+            <circle id="flightDot" r="5" fill="#c9a96e" filter="url(#glow)" cx="40" cy="70"/>
+        </svg>
+    </div>
+    <div class="route-labels fade-element delay-4">
+        <span class="route-label origin">Vietnam</span>
+        <span class="route-label dest">North Carolina</span>
+    </div>
+</section>
+
+<div class="spacer"></div>
+
+<!-- ═══════════ BRIDGE TEXT ═══════════ -->
+<section class="screen quote-section">
+    <p class="quote-text fade-element">
+        She didn't come here to blend in.<br>
+        She came here to <span class="em">be exceptional</span>.
+    </p>
+</section>
+
+<div class="spacer-sm"></div>
+
+<!-- ═══════════ CELL DIVISION — WORKLOAD ═══════════ -->
+<section class="cell-section" id="cellSection">
+    <span class="label fade-element">This semester alone</span>
+    <div class="divider fade-element delay-1"></div>
+    <div class="cell-canvas-wrap">
+        <canvas id="cellCanvas"></canvas>
+    </div>
+    <div class="big-number" id="cellNumber">1</div>
+    <div class="big-number-label">credit hours</div>
+    <div class="big-number-context fade-element delay-2">
+        The average student takes 15. The ambitious take 18.<br>
+        Katie takes 22 — and makes it look effortless.
+    </div>
+</section>
+
+<div class="spacer"></div>
+
+<!-- ═══════════ 3D BRAIN — SUBJECTS ═══════════ -->
+<section class="brain-section" id="brainSection">
+    <div class="brain-canvas-wrap">
+        <canvas id="brainCanvas"></canvas>
+    </div>
+
+    <div class="brain-overlay">
+        <div class="brain-header" id="brainHeader">
+            <span class="label">What she studies</span>
+            <div class="divider"></div>
+            <h2 class="studies-title">Her neural network<br>of <em>knowledge</em></h2>
+        </div>
+    </div>
+
+    <!-- Subject Cards (animated in/out by GSAP) -->
+    <div class="subject-card" id="card-math">
+        <div class="subject-card-region">Parietal Lobe — Superior</div>
+        <h3 class="subject-card-name" style="color: #c9a96e;">Mathematics</h3>
+        <p class="subject-card-fact">The intraparietal sulcus fires every time Katie solves a differential equation. This same region lets us estimate quantities before we can even count.</p>
+        <div class="subject-card-buzzwords">
+            <span class="buzzword">Derivatives</span>
+            <span class="buzzword">Linear Algebra</span>
+            <span class="buzzword">Calculus</span>
+            <span class="buzzword">Proofs</span>
+            <span class="buzzword">Integrals</span>
+        </div>
+    </div>
+
+    <div class="subject-card" id="card-bio">
+        <div class="subject-card-region">Prefrontal Cortex</div>
+        <h3 class="subject-card-name" style="color: #4ecdc4;">Biology</h3>
+        <p class="subject-card-fact">The prefrontal cortex orchestrates scientific thinking — forming hypotheses, designing experiments, and drawing conclusions. Katie's command center.</p>
+        <div class="subject-card-buzzwords">
+            <span class="buzzword">CRISPR</span>
+            <span class="buzzword">Genetics</span>
+            <span class="buzzword">Cell Biology</span>
+            <span class="buzzword">Evolution</span>
+            <span class="buzzword">Ecology</span>
+        </div>
+    </div>
+
+    <div class="subject-card" id="card-chem">
+        <div class="subject-card-region">Inferior Parietal Lobe</div>
+        <h3 class="subject-card-name" style="color: #ff6b6b;">Chemistry</h3>
+        <p class="subject-card-fact">Visualizing molecular structures activates the same spatial reasoning center that lets us mentally rotate 3D objects. Every organic chemistry model lights up this region.</p>
+        <div class="subject-card-buzzwords">
+            <span class="buzzword">Organic Chem</span>
+            <span class="buzzword">Molecular Bonds</span>
+            <span class="buzzword">Stoichiometry</span>
+            <span class="buzzword">Reactions</span>
+            <span class="buzzword">Compounds</span>
+        </div>
+    </div>
+
+    <div class="subject-card" id="card-psych">
+        <div class="subject-card-region">Temporal Lobe</div>
+        <h3 class="subject-card-name" style="color: #a8e6cf;">Dev Psychology</h3>
+        <p class="subject-card-fact">The temporal lobe houses our autobiographical memory and emotional processing — the very systems developmental psychology studies across the human lifespan.</p>
+        <div class="subject-card-buzzwords">
+            <span class="buzzword">Cognition</span>
+            <span class="buzzword">Attachment</span>
+            <span class="buzzword">Neuroplasticity</span>
+            <span class="buzzword">Development</span>
+            <span class="buzzword">Memory</span>
+        </div>
+    </div>
+
+    <div class="subject-card" id="card-spanish">
+        <div class="subject-card-region">Broca's Area — Left Frontal</div>
+        <h3 class="subject-card-name" style="color: #e8d5a8;">Spanish</h3>
+        <p class="subject-card-fact">Broca's area handles speech production in every language you speak. For trilinguals like Katie, this region is measurably denser than monolinguals.</p>
+        <div class="subject-card-buzzwords">
+            <span class="buzzword">Conjugation</span>
+            <span class="buzzword">Fluency</span>
+            <span class="buzzword">Subjunctive</span>
+            <span class="buzzword">Vocabulary</span>
+            <span class="buzzword">Immersion</span>
+        </div>
+    </div>
+
+    <div class="subject-card" id="card-english">
+        <div class="subject-card-region">Wernicke's Area — Left Temporal</div>
+        <h3 class="subject-card-name" style="color: #d4736c;">English 112</h3>
+        <p class="subject-card-fact">Wernicke's area transforms written symbols into meaning. Every research paper Katie writes activates this region in a cascade from comprehension to composition.</p>
+        <div class="subject-card-buzzwords">
+            <span class="buzzword">Rhetoric</span>
+            <span class="buzzword">Analysis</span>
+            <span class="buzzword">Research</span>
+            <span class="buzzword">Thesis</span>
+            <span class="buzzword">Citations</span>
+        </div>
+    </div>
+
+    <!-- Accessible fallback -->
+    <ul class="sr-only">
+        <li>Mathematics — Parietal Lobe — numerical cognition</li>
+        <li>Biology — Prefrontal Cortex — scientific thinking</li>
+        <li>Chemistry — Inferior Parietal Lobe — spatial reasoning</li>
+        <li>Developmental Psychology — Temporal Lobe — memory and emotion</li>
+        <li>Spanish — Broca's Area — speech production</li>
+        <li>English 112 — Wernicke's Area — language comprehension</li>
+    </ul>
+</section>
+
+<div class="spacer"></div>
+
+<!-- ═══════════ GPA — FUNCTION PLOT ═══════════ -->
+<section class="gpa-section" id="gpaSection">
+    <span class="label fade-element">And her grade point average?</span>
+    <div class="divider fade-element delay-1"></div>
+    <div class="gpa-canvas-wrap">
+        <canvas id="gpaCanvas"></canvas>
+    </div>
+    <div class="gpa-big-reveal" id="gpaReveal">4.0</div>
+    <div class="big-number-label fade-element delay-2">perfect</div>
+    <div class="big-number-context fade-element delay-3">
+        Not a 3.9. Not a 3.95.<br>
+        A 4.0. Flawless. Under 22 credits of pressure.
+    </div>
+    <div class="math-notation fade-element delay-4">
+        <span class="equation">f(x) = 4(1 − e⁻³ˣ)</span>
+        <span class="equation">f'(x) = 12e⁻³ˣ &gt; 0</span>
+        <span class="equation">lim f(x) = 4.0 = perfection</span>
+    </div>
+</section>
+
+<div class="spacer"></div>
+
+<!-- ═══════════ START RESEARCH PROGRAM ═══════════ -->
+<section class="start-section" id="startSection">
+    <div class="start-header">
+        <span class="label fade-element">Beyond the classroom</span>
+        <div class="divider fade-element delay-1"></div>
+        <h2 class="start-title fade-element delay-2">Not just a student.<br>A <em>researcher</em>.</h2>
+    </div>
+
+    <div class="start-acronym fade-element delay-3">
+        <span class="start-letter"><strong>S</strong>TEM</span>
+        <span class="start-letter"><strong>A</strong>cademic</span>
+        <span class="start-letter"><strong>R</strong>esearch</span>
+        <span class="start-letter">&amp; <strong>T</strong>raining</span>
+    </div>
+
+    <div class="start-stats fade-element delay-3">
+        <div class="start-stat">
+            <div class="start-stat-number">$1.4M</div>
+            <div class="start-stat-label">NSF-funded<br>research grant</div>
+        </div>
+        <div class="start-stat">
+            <div class="start-stat-number">~32%</div>
+            <div class="start-stat-label">acceptance<br>rate</div>
+        </div>
+        <div class="start-stat">
+            <div class="start-stat-number">50</div>
+            <div class="start-stat-label">students selected<br>per semester</div>
+        </div>
+    </div>
+
+    <p class="start-desc fade-element">
+        Katie was selected for Wake Tech's START program — an NSF-funded
+        undergraduate research initiative where community college students
+        conduct faculty-mentored, hands-on research using the same techniques
+        found in professional labs. Published. Peer-reviewed. At a two-year college.
+    </p>
+
+    <div class="start-techniques fade-element delay-1">
+        <span class="tech-tag">CRISPR</span>
+        <span class="tech-tag">PCR</span>
+        <span class="tech-tag">Gel Electrophoresis</span>
+        <span class="tech-tag">Gene Regulation</span>
+        <span class="tech-tag">Peer Review</span>
+        <span class="tech-tag">Eureka! Journal</span>
+    </div>
+
+</section>
+
+<div class="spacer"></div>
+
+<!-- ═══════════ GOLDEN SPIRAL — FUTURE ═══════════ -->
+<section class="spiral-section" id="spiralSection">
+    <div class="spiral-canvas-wrap">
+        <canvas id="spiralCanvas"></canvas>
+    </div>
+    <div class="spiral-content">
+        <span class="label fade-element">Where she's heading</span>
+        <div class="divider fade-element delay-1"></div>
+        <h2 class="spiral-title fade-element delay-2">UNC Chapel Hill</h2>
+        <p class="spiral-sub fade-element delay-3">
+            Double major: <span class="highlight">Biology &amp; Neuroscience</span>
+        </p>
+        <p class="spiral-context fade-element delay-4">
+            Where math meets life, and curiosity meets purpose.<br>
+            The golden ratio — nature's own perfection — guides her path.
+        </p>
+    </div>
+</section>
+
+<div class="spacer-sm"></div>
+
+<!-- ═══════════ BOBA — MOLECULAR ═══════════ -->
+<section class="boba-section" id="bobaSection">
+    <div class="boba-pearls" id="bobaParticles"></div>
+    <div class="boba-icon fade-element">
+        <svg class="boba-cup" viewBox="0 0 160 180" fill="none">
+            <!-- Hexagonal molecular cup body -->
+            <polygon points="55,40 105,40 120,80 120,140 105,160 55,160 40,140 40,80"
+                     fill="none" stroke="rgba(201,169,110,0.25)" stroke-width="1"/>
+            <!-- Internal hex rings (benzene style) -->
+            <polygon points="65,85 85,75 105,85 105,105 85,115 65,105"
+                     fill="rgba(201,169,110,0.04)" stroke="rgba(201,169,110,0.15)" stroke-width="0.8"/>
+            <polygon points="65,105 85,95 105,105 105,125 85,135 65,125"
+                     fill="rgba(201,169,110,0.03)" stroke="rgba(201,169,110,0.12)" stroke-width="0.8"/>
+            <!-- Dome lid arc -->
+            <path d="M 55 40 Q 80 15 105 40" stroke="rgba(201,169,110,0.3)" stroke-width="1.2" fill="none"/>
+            <!-- Straw as bond -->
+            <line x1="88" y1="8" x2="78" y2="75" stroke="rgba(201,169,110,0.5)" stroke-width="2" stroke-linecap="round"/>
+            <!-- Atom vertices on cup structure -->
+            <circle cx="55" cy="40" r="2.5" fill="rgba(201,169,110,0.3)"/>
+            <circle cx="105" cy="40" r="2.5" fill="rgba(201,169,110,0.3)"/>
+            <circle cx="120" cy="80" r="2.5" fill="rgba(201,169,110,0.3)"/>
+            <circle cx="120" cy="140" r="2.5" fill="rgba(201,169,110,0.3)"/>
+            <circle cx="40" cy="80" r="2.5" fill="rgba(201,169,110,0.3)"/>
+            <circle cx="40" cy="140" r="2.5" fill="rgba(201,169,110,0.3)"/>
+            <!-- Boba pearls as atoms with electron shells -->
+            <circle class="boba-pearl-interactive" cx="65" cy="145" r="7" fill="rgba(201,169,110,0.15)" stroke="rgba(201,169,110,0.4)" stroke-width="1"/>
+            <circle class="boba-pearl-interactive" cx="80" cy="150" r="7" fill="rgba(201,169,110,0.15)" stroke="rgba(201,169,110,0.4)" stroke-width="1"/>
+            <circle class="boba-pearl-interactive" cx="95" cy="145" r="7" fill="rgba(201,169,110,0.15)" stroke="rgba(201,169,110,0.4)" stroke-width="1"/>
+            <circle class="boba-pearl-interactive" cx="72" cy="138" r="5.5" fill="rgba(201,169,110,0.1)" stroke="rgba(201,169,110,0.3)" stroke-width="0.8"/>
+            <circle class="boba-pearl-interactive" cx="88" cy="138" r="5.5" fill="rgba(201,169,110,0.1)" stroke="rgba(201,169,110,0.3)" stroke-width="0.8"/>
+            <!-- Electron orbits on two pearls -->
+            <ellipse cx="65" cy="145" rx="11" ry="5" fill="none" stroke="rgba(201,169,110,0.12)" stroke-width="0.5" transform="rotate(-30 65 145)"/>
+            <ellipse cx="95" cy="145" rx="11" ry="5" fill="none" stroke="rgba(201,169,110,0.12)" stroke-width="0.5" transform="rotate(30 95 145)"/>
+        </svg>
+    </div>
+    <p class="boba-text fade-element delay-1">
+        And after conquering all of that?<br>She just wants boba.
+    </p>
+</section>
+
+<div class="spacer"></div>
+
+<!-- ═══════════ FINALE — SYNAPSE LIGHTNING ═══════════ -->
+<section class="finale" id="finaleSection">
+    <canvas id="synapseCanvas"></canvas>
+    <div class="finale-content">
+        <span class="label fade-element">The conclusion</span>
+        <div class="divider fade-element delay-1"></div>
+        <div class="synapse-stats" id="synapseStats">
+            <span class="synapse-stat" data-index="0">9,146 miles</span>
+            <span class="synapse-stat" data-index="1">22 credits</span>
+            <span class="synapse-stat" data-index="2">4.0 GPA</span>
+            <span class="synapse-stat" data-index="3">6 subjects</span>
+        </div>
+        <h2 class="finale-declaration fade-element delay-2">Extraordinary.</h2>
+        <p class="finale-sub fade-element delay-3">
+            9,146 miles. 22 credits. A 4.0 GPA. Six challenging subjects.<br>
+            A story of discipline, brilliance, and unstoppable ambition.
+        </p>
+        <p class="finale-sub fade-element delay-4" style="margin-top: 16px; color: var(--warm-light);">
+            Biology &amp; Neuroscience at the University of North Carolina at Chapel Hill.
+        </p>
+    </div>
+</section>
+
+<!-- Footer -->
+<div class="footer">
+    <p>MADE WITH LOVE · 2025</p>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// GLOBALS & SETUP
+// ═══════════════════════════════════════════════════════
+gsap.registerPlugin(ScrollTrigger);
+const dpr = Math.min(window.devicePixelRatio || 1, 2);
+let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+
+function setupCanvas(canvas) {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    return { ctx, w: rect.width, h: rect.height };
+}
+
+document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+
+// ═══════════════════════════════════════════════════════
+// PRELOADER
+// ═══════════════════════════════════════════════════════
+(function() {
+    const bases = 'ATGCGATCAATGCGTACGATCG';
+    const colors = { A: '#4ecdc4', T: '#ff6b6b', G: '#c9a96e', C: '#a8e6cf' };
+    const container = document.getElementById('preloaderDna');
+    bases.split('').forEach((b, i) => {
+        const span = document.createElement('span');
+        span.textContent = b;
+        span.style.color = colors[b];
+        span.style.animationDelay = (i * 0.04) + 's';
+        container.appendChild(span);
+    });
+})();
+
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        document.getElementById('preloader').classList.add('hidden');
+        ScrollTrigger.refresh();
+    }, 1400);
+    // Second refresh after layout fully settles (fonts, pin spacers)
+    setTimeout(() => ScrollTrigger.refresh(), 1800);
+});
+
+// ═══════════════════════════════════════════════════════
+// PROGRESS BAR
+// ═══════════════════════════════════════════════════════
+const progressBarEl = document.getElementById('progressBar');
+let progressRafPending = false;
+window.addEventListener('scroll', () => {
+    if (progressRafPending) return;
+    progressRafPending = true;
+    requestAnimationFrame(() => {
+        const progress = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+        progressBarEl.style.width = progress + '%';
+        progressRafPending = false;
+    });
+}, { passive: true });
+
+// ═══════════════════════════════════════════════════════
+// SCROLL REVEAL (IntersectionObserver for fade-elements)
+// ═══════════════════════════════════════════════════════
+const fadeObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+}, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el));
+
+// ═══════════════════════════════════════════════════════
+// GENOME TICKER
+// ═══════════════════════════════════════════════════════
+(function() {
+    const track = document.getElementById('genomeTrack');
+    const bases = 'ATGC';
+    const classMap = { A: 'ba', T: 'bt', G: 'bg', C: 'bc' };
+    // Encode KATIE: AAA(K) GCU(A) ACU(T) AUU(I) GAA(E) then random padding
+    const message = 'AAAGCUACUAUUGAA';
+    let seq = '';
+    for (let i = 0; i < 600; i++) {
+        if (i >= 50 && i < 50 + message.length) {
+            seq += message[i - 50] === 'U' ? 'T' : message[i - 50];
+        } else {
+            seq += bases[Math.floor(Math.random() * 4)];
+        }
+    }
+    // Double for seamless loop
+    const fullSeq = seq + seq;
+    let html = '';
+    for (const ch of fullSeq) {
+        const b = ch === 'U' ? 'T' : ch;
+        html += `<span class="${classMap[b] || 'bg'}">${b}</span>`;
+    }
+    track.innerHTML = html;
+})();
+
+// ═══════════════════════════════════════════════════════
+// FLOATING MATH SYMBOLS
+// ═══════════════════════════════════════════════════════
+(function() {
+    const symbols = ['∫', 'Σ', '∂', 'Δ', 'π', 'φ', '∞', '√', 'λ', 'θ', 'α', 'β', 'Ω', '∇', 'ε'];
+    const container = document.getElementById('mathBg');
+    const count = window.innerWidth < 768 ? 7 : 15;
+    for (let i = 0; i < count; i++) {
+        const span = document.createElement('span');
+        span.className = 'math-symbol';
+        span.textContent = symbols[i % symbols.length];
+        span.style.left = (5 + Math.random() * 90) + '%';
+        span.style.top = (Math.random() * 300) + 'vh';
+        span.style.fontSize = (1.2 + Math.random() * 2) + 'rem';
+        span.dataset.speed = (0.02 + Math.random() * 0.06).toFixed(3);
+        container.appendChild(span);
+    }
+
+    const mathSymbols = container.querySelectorAll('.math-symbol');
+    let mathRafPending = false;
+    window.addEventListener('scroll', () => {
+        if (mathRafPending) return;
+        mathRafPending = true;
+        requestAnimationFrame(() => {
+            const sy = window.scrollY;
+            mathSymbols.forEach(s => {
+                const speed = parseFloat(s.dataset.speed);
+                s.style.transform = `translateY(${-sy * speed}px)`;
+            });
+            mathRafPending = false;
+        });
+    }, { passive: true });
+})();
+
+// ═══════════════════════════════════════════════════════
+// CURSOR TRAIL (desktop only)
+// ═══════════════════════════════════════════════════════
+(function() {
+    if (!window.matchMedia('(hover: hover)').matches) return;
+    const particles = [];
+    const MAX = 12;
+    let lastX = 0, lastY = 0;
+
+    document.addEventListener('mousemove', e => {
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        if (Math.abs(dx) + Math.abs(dy) < 8) return;
+        lastX = e.clientX;
+        lastY = e.clientY;
+
+        const dot = document.createElement('div');
+        dot.className = 'cursor-dot';
+        const size = 2 + Math.random() * 3;
+        dot.style.width = size + 'px';
+        dot.style.height = size + 'px';
+        dot.style.left = e.clientX + 'px';
+        dot.style.top = e.clientY + 'px';
+        dot.style.opacity = '0.6';
+        dot.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
+        document.body.appendChild(dot);
+
+        requestAnimationFrame(() => {
+            dot.style.opacity = '0';
+            dot.style.transform = `translate(${(Math.random()-0.5)*20}px, ${(Math.random()-0.5)*20}px) scale(0)`;
+        });
+
+        particles.push(dot);
+        if (particles.length > MAX) {
+            const old = particles.shift();
+            if (old.parentElement) old.remove();
+        }
+
+        setTimeout(() => { if (dot.parentElement) dot.remove(); }, 600);
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 1. DNA HELIX — HERO CANVAS
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('dnaCanvas');
+    let ctx, w, h;
+    let isActive = true;
+    let time = 0;
+
+    function resize() {
+        const r = setupCanvas(canvas);
+        ctx = r.ctx; w = r.w; h = r.h;
+    }
+
+    function render() {
+        if (!isActive) return;
+        requestAnimationFrame(render);
+        time++;
+        ctx.clearRect(0, 0, w, h);
+
+        const centerX = w / 2;
+        const centerY = h / 2;
+        const amplitude = Math.min(w * 0.15, 120);
+        const helixH = h * 0.75;
+        const nPairs = 40;
+        const rotSpeed = 0.015;
+
+        // Mouse parallax
+        const mx = ((mouseX / w) - 0.5) * 30;
+        const my = ((mouseY / h) - 0.5) * 15;
+
+        // Collect pairs with z-depth for sorting
+        const pairs = [];
+        for (let i = 0; i < nPairs; i++) {
+            const t = i / nPairs;
+            const y = centerY - helixH / 2 + t * helixH + my;
+            const angle = t * Math.PI * 6 + time * rotSpeed;
+            const z1 = Math.cos(angle);
+            const z2 = Math.cos(angle + Math.PI);
+            const x1 = centerX + Math.sin(angle) * amplitude + mx;
+            const x2 = centerX + Math.sin(angle + Math.PI) * amplitude + mx;
+            pairs.push({ y, x1, x2, z1, z2, t, angle });
+        }
+
+        // Draw back strand connections first (z < 0)
+        pairs.forEach(p => {
+            const minZ = Math.min(p.z1, p.z2);
+            if (minZ < 0.3) {
+                // Base pair line
+                ctx.beginPath();
+                ctx.moveTo(p.x1, p.y);
+                ctx.lineTo(p.x2, p.y);
+                ctx.strokeStyle = `rgba(201, 169, 110, ${0.04 + Math.max(0, minZ) * 0.08})`;
+                ctx.lineWidth = 0.8;
+                ctx.stroke();
+            }
+        });
+
+        // Draw front base pair lines
+        pairs.forEach(p => {
+            const minZ = Math.min(p.z1, p.z2);
+            if (minZ >= 0.3) {
+                ctx.beginPath();
+                ctx.moveTo(p.x1, p.y);
+                ctx.lineTo(p.x2, p.y);
+                ctx.strokeStyle = `rgba(201, 169, 110, ${0.06 + minZ * 0.15})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        });
+
+        // Draw backbone curves (two strands)
+        for (let strand = 0; strand < 2; strand++) {
+            ctx.beginPath();
+            for (let i = 0; i < nPairs; i++) {
+                const t = i / nPairs;
+                const y = centerY - helixH / 2 + t * helixH + my;
+                const angle = t * Math.PI * 6 + time * rotSpeed + (strand * Math.PI);
+                const x = centerX + Math.sin(angle) * amplitude + mx;
+                const z = Math.cos(angle);
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = 'rgba(201, 169, 110, 0.12)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        }
+
+        // Draw nucleotide dots
+        pairs.forEach(p => {
+            [{ x: p.x1, z: p.z1 }, { x: p.x2, z: p.z2 }].forEach(dot => {
+                const r = 1.5 + (dot.z + 1) * 1.5;
+                const alpha = 0.15 + (dot.z + 1) * 0.25;
+                ctx.beginPath();
+                ctx.arc(dot.x, p.y, r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(201, 169, 110, ${alpha})`;
+                ctx.fill();
+
+                // Glow on front-facing dots
+                if (dot.z > 0.5) {
+                    ctx.beginPath();
+                    ctx.arc(dot.x, p.y, r + 3, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(201, 169, 110, ${(dot.z - 0.5) * 0.1})`;
+                    ctx.fill();
+                }
+            });
+        });
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    render();
+
+    // Fade hero on scroll
+    ScrollTrigger.create({
+        trigger: '#heroSection',
+        start: 'top top',
+        end: 'bottom top',
+        onLeave: () => { isActive = false; },
+        onEnterBack: () => { isActive = true; render(); }
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 2. DISTANCE — SCROLL-SCRUBBED FLIGHT PATH
+// ═══════════════════════════════════════════════════════
+(function() {
+    const path = document.getElementById('flightPathDrawn');
+    const dot = document.getElementById('flightDot');
+    const destDot = document.querySelector('#routeSvg circle:nth-of-type(2)');
+    const counter = document.getElementById('distanceCounter');
+
+    const pathLength = path.getTotalLength();
+    path.style.strokeDasharray = pathLength;
+    path.style.strokeDashoffset = pathLength;
+
+    gsap.to(path, {
+        strokeDashoffset: 0,
+        ease: 'none',
+        scrollTrigger: {
+            trigger: '#distanceSection',
+            start: 'top 80%',
+            end: 'bottom 30%',
+            scrub: 1,
+            onUpdate: (self) => {
+                const p = self.progress;
+                const point = path.getPointAtLength(p * pathLength);
+                dot.setAttribute('cx', point.x);
+                dot.setAttribute('cy', point.y);
+                counter.textContent = Math.round(p * 9146).toLocaleString();
+                destDot.setAttribute('opacity', p > 0.9 ? ((p - 0.9) * 10) : 0);
+            }
+        }
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 3. THREE.JS 3D BRAIN — SUBJECTS (SCROLL-SCRUBBED)
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('brainCanvas');
+    const header = document.getElementById('brainHeader');
+    // Brain finale text removed
+
+    // Subject data with 3D brain region positions (x, y, z in brain-local coords)
+    const subjects = [
+        {
+            id: 'math', cardId: 'card-math', color: 0xc9a96e,
+            // Parietal lobe superior — top-back of brain
+            pos: { x: 0.3, y: 0.8, z: -0.2 },
+        },
+        {
+            id: 'bio', cardId: 'card-bio', color: 0x4ecdc4,
+            // Prefrontal cortex — front of brain
+            pos: { x: -0.6, y: 0.4, z: 0.5 },
+        },
+        {
+            id: 'chem', cardId: 'card-chem', color: 0xff6b6b,
+            // Inferior parietal — lower-back
+            pos: { x: 0.4, y: 0.1, z: -0.5 },
+        },
+        {
+            id: 'psych', cardId: 'card-psych', color: 0xa8e6cf,
+            // Temporal lobe — side-lower
+            pos: { x: -0.2, y: -0.5, z: 0.6 },
+        },
+        {
+            id: 'spanish', cardId: 'card-spanish', color: 0xe8d5a8,
+            // Broca's area — left frontal lower
+            pos: { x: -0.7, y: -0.1, z: 0.3 },
+        },
+        {
+            id: 'english', cardId: 'card-english', color: 0xd4736c,
+            // Wernicke's area — left temporal-parietal
+            pos: { x: 0.1, y: -0.3, z: 0.7 },
+        },
+    ];
+
+    // Three.js scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    camera.position.set(0, 0, 4);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+
+    // Build brain geometry — elongated sphere with vertex noise
+    const brainGeo = new THREE.SphereGeometry(1, 32, 24);
+    const posAttr = brainGeo.attributes.position;
+    for (let i = 0; i < posAttr.count; i++) {
+        let x = posAttr.getX(i);
+        let y = posAttr.getY(i);
+        let z = posAttr.getZ(i);
+        // Elongate front-to-back (x axis)
+        x *= 1.3;
+        // Slightly wider laterally (z)
+        z *= 1.1;
+        // Flatten top slightly
+        if (y > 0.5) y *= 0.9;
+        // Frontal lobe bulge
+        if (x < -0.3 && y > 0) x -= 0.15;
+        // Add organic noise
+        const noise = 0.03 * Math.sin(x * 8 + y * 6) + 0.02 * Math.cos(z * 10 + x * 4);
+        const len = Math.sqrt(x*x + y*y + z*z);
+        x += (x/len) * noise;
+        y += (y/len) * noise;
+        z += (z/len) * noise;
+        posAttr.setXYZ(i, x, y, z);
+    }
+    brainGeo.computeVertexNormals();
+
+    // Wireframe brain
+    const wireMat = new THREE.MeshBasicMaterial({
+        color: 0xc9a96e,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.08
+    });
+    const brainWire = new THREE.Mesh(brainGeo, wireMat);
+    scene.add(brainWire);
+
+    // Point cloud brain surface
+    const pointsMat = new THREE.PointsMaterial({
+        color: 0xc9a96e,
+        size: 0.02,
+        transparent: true,
+        opacity: 0.3,
+        sizeAttenuation: true
+    });
+    const brainPoints = new THREE.Points(brainGeo, pointsMat);
+    scene.add(brainPoints);
+
+    // Region highlight spheres (glow indicators on brain surface)
+    const regionMeshes = [];
+    subjects.forEach(sub => {
+        const glowGeo = new THREE.SphereGeometry(0.12, 16, 12);
+        const glowMat = new THREE.MeshBasicMaterial({
+            color: sub.color,
+            transparent: true,
+            opacity: 0,
+        });
+        const mesh = new THREE.Mesh(glowGeo, glowMat);
+        mesh.position.set(sub.pos.x, sub.pos.y, sub.pos.z);
+        brainWire.add(mesh); // child of brain so it rotates with it
+        regionMeshes.push({ mesh, mat: glowMat, sub });
+
+        // Smaller bright core
+        const coreGeo = new THREE.SphereGeometry(0.05, 8, 8);
+        const coreMat = new THREE.MeshBasicMaterial({
+            color: sub.color,
+            transparent: true,
+            opacity: 0,
+        });
+        const core = new THREE.Mesh(coreGeo, coreMat);
+        mesh.add(core);
+        regionMeshes[regionMeshes.length - 1].core = core;
+        regionMeshes[regionMeshes.length - 1].coreMat = coreMat;
+    });
+
+    // Scattered internal neuron particles
+    const neuronCount = 200;
+    const neuronGeo = new THREE.BufferGeometry();
+    const neuronPositions = new Float32Array(neuronCount * 3);
+    for (let i = 0; i < neuronCount; i++) {
+        // Random point inside ellipsoid
+        let x, y, z;
+        do {
+            x = (Math.random() - 0.5) * 2.6;
+            y = (Math.random() - 0.5) * 2;
+            z = (Math.random() - 0.5) * 2.2;
+        } while ((x/1.3)**2 + y**2 + (z/1.1)**2 > 0.85);
+        neuronPositions[i*3] = x;
+        neuronPositions[i*3+1] = y;
+        neuronPositions[i*3+2] = z;
+    }
+    neuronGeo.setAttribute('position', new THREE.BufferAttribute(neuronPositions, 3));
+    const neuronMat = new THREE.PointsMaterial({
+        color: 0xc9a96e,
+        size: 0.015,
+        transparent: true,
+        opacity: 0.15,
+        sizeAttenuation: true
+    });
+    const neuronPoints = new THREE.Points(neuronGeo, neuronMat);
+    brainWire.add(neuronPoints);
+
+    // Animation state
+    let scrollProgress = 0;
+    let isActive = false;
+    let activeCard = null;
+    let animFrame = 0;
+
+    // Card elements
+    const cards = subjects.map(s => document.getElementById(s.cardId));
+
+    function getActiveSubjectIndex(progress) {
+        if (progress < 0.07 || progress > 0.85) return -1;
+        const subProgress = (progress - 0.07) / 0.78; // 0-1 across all subjects
+        return Math.min(5, Math.floor(subProgress * 6));
+    }
+
+    function getSubjectLocalProgress(progress, index) {
+        const start = 0.07 + (index / 6) * 0.78;
+        const end = start + 0.78 / 6;
+        return Math.max(0, Math.min(1, (progress - start) / (end - start)));
+    }
+
+    function resize() {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        renderer.setSize(rect.width, rect.height);
+        camera.aspect = rect.width / rect.height;
+        camera.updateProjectionMatrix();
+    }
+
+    function render() {
+        if (!isActive) return;
+        animFrame = requestAnimationFrame(render);
+
+        // Rotate brain based on scroll (full 360° over entire section)
+        brainWire.rotation.y = scrollProgress * Math.PI * 2 + 0.5;
+        brainPoints.rotation.y = brainWire.rotation.y;
+
+        // Gentle idle float
+        const t = Date.now() * 0.001;
+        brainWire.rotation.x = Math.sin(t * 0.3) * 0.08;
+        brainPoints.rotation.x = brainWire.rotation.x;
+
+        // Header fade (visible only at start)
+        header.style.opacity = scrollProgress < 0.05 ? '1' : Math.max(0, 1 - (scrollProgress - 0.05) / 0.05);
+
+        // Brain finale text removed
+
+        // Determine active subject
+        const activeIndex = getActiveSubjectIndex(scrollProgress);
+
+        // Update region glows and cards
+        regionMeshes.forEach((rm, i) => {
+            const isCurrentlyActive = i === activeIndex;
+            const isFinale = scrollProgress > 0.85;
+
+            if (isCurrentlyActive) {
+                const localP = getSubjectLocalProgress(scrollProgress, i);
+                // Card woosh: 0-0.3 = fly in, 0.3-0.7 = visible, 0.7-1.0 = fly out
+                let cardScale, cardOpacity;
+                if (localP < 0.25) {
+                    cardScale = localP / 0.25;
+                    cardOpacity = localP / 0.25;
+                } else if (localP < 0.75) {
+                    cardScale = 1;
+                    cardOpacity = 1;
+                } else {
+                    cardScale = 1 - (localP - 0.75) / 0.25;
+                    cardOpacity = 1 - (localP - 0.75) / 0.25;
+                }
+
+                cards[i].style.opacity = cardOpacity;
+                cards[i].style.transform = `translate(-50%, -50%) scale(${0.6 + cardScale * 0.4})`;
+
+                // Show buzzwords with stagger when card is visible
+                const buzzwords = cards[i].querySelectorAll('.buzzword');
+                buzzwords.forEach((bw, bi) => {
+                    const buzzStart = 0.2 + bi * 0.06;
+                    if (localP > buzzStart && localP < 0.8) {
+                        bw.classList.add('visible');
+                    } else {
+                        bw.classList.remove('visible');
+                    }
+                });
+
+                // Glow the region on brain
+                rm.mat.opacity = 0.4 + Math.sin(t * 3) * 0.1;
+                rm.coreMat.opacity = 0.8;
+            } else if (isFinale) {
+                // All regions glow gently in finale
+                rm.mat.opacity = 0.2 + Math.sin(t * 2 + i) * 0.08;
+                rm.coreMat.opacity = 0.5;
+
+                cards[i].style.opacity = '0';
+                cards[i].style.transform = 'translate(-50%, -50%) scale(0)';
+                cards[i].querySelectorAll('.buzzword').forEach(bw => bw.classList.remove('visible'));
+            } else {
+                rm.mat.opacity = 0.05;
+                rm.coreMat.opacity = 0.1;
+
+                cards[i].style.opacity = '0';
+                cards[i].style.transform = 'translate(-50%, -50%) scale(0)';
+                cards[i].querySelectorAll('.buzzword').forEach(bw => bw.classList.remove('visible'));
+            }
+        });
+
+        // Pulse internal neurons
+        neuronMat.opacity = 0.1 + Math.sin(t * 1.5) * 0.05;
+
+        renderer.render(scene, camera);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    const brainEl = document.getElementById('brainSection');
+
+    // Defer ScrollTrigger creation to run AFTER the cell section's trigger
+    // is created (cell JS runs after brain JS but cell is above brain in DOM).
+    // Without deferring, the brain's trigger fires onEnter immediately with
+    // incorrect position (cell's pin spacer doesn't exist yet).
+    requestAnimationFrame(() => {
+        ScrollTrigger.create({
+            trigger: '#brainSection',
+            start: 'top top',
+            end: '+=500%',
+            pin: true,
+            scrub: 1,
+            onUpdate: (self) => { scrollProgress = self.progress; },
+            onEnter: () => {
+                isActive = true;
+                brainEl.style.visibility = 'visible';
+                gsap.to(brainEl, { opacity: 1, duration: 0.8, ease: 'power2.out' });
+                render();
+            },
+            onLeave: () => { isActive = false; cancelAnimationFrame(animFrame); },
+            onEnterBack: () => {
+                isActive = true;
+                brainEl.style.visibility = 'visible';
+                gsap.set(brainEl, { opacity: 1 });
+                render();
+            },
+            onLeaveBack: () => {
+                isActive = false;
+                cancelAnimationFrame(animFrame);
+                gsap.to(brainEl, { opacity: 0, duration: 0.3, onComplete: () => {
+                    brainEl.style.visibility = 'hidden';
+                }});
+            }
+        });
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 4. CELL DIVISION — WORKLOAD (SCROLL-SCRUBBED)
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('cellCanvas');
+    const cellNumber = document.getElementById('cellNumber');
+    let ctx, w, h;
+    let cellProgress = 0;
+    let isActive = false;
+
+    const cellColors = ['#c9a96e', '#4ecdc4', '#ff6b6b', '#a8e6cf', '#e8d5a8', '#d4736c'];
+
+    // Cell positions — we'll compute them based on count
+    function getCellPositions(count, w, h) {
+        const cells = [];
+        const cols = Math.ceil(Math.sqrt(count * (w / h)));
+        const rows = Math.ceil(count / cols);
+        const cellW = w / (cols + 1);
+        const cellH = h / (rows + 1);
+        for (let i = 0; i < count; i++) {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            cells.push({
+                x: cellW * (col + 1) + (Math.random() - 0.5) * cellW * 0.3,
+                y: cellH * (row + 1) + (Math.random() - 0.5) * cellH * 0.3,
+                rx: cellW * 0.3 + Math.random() * 5,
+                ry: cellH * 0.28 + Math.random() * 5,
+                color: cellColors[i % cellColors.length],
+                phase: Math.random() * Math.PI * 2
+            });
+        }
+        return cells;
+    }
+
+    let cachedCount = -1;
+    let cachedCells = [];
+
+    function resize() {
+        const r = setupCanvas(canvas);
+        ctx = r.ctx; w = r.w; h = r.h;
+        cachedCount = -1; // Force recompute on resize
+    }
+
+    function drawCell(x, y, rx, ry, color, time, divisionPhase) {
+        // divisionPhase: 0 = normal, 0-1 = dividing
+        ctx.save();
+        ctx.translate(x, y);
+
+        if (divisionPhase > 0 && divisionPhase < 1) {
+            // Stretching cell
+            const stretch = 1 + divisionPhase * 0.8;
+            const pinch = 1 - divisionPhase * 0.4;
+            ctx.scale(stretch, pinch);
+        }
+
+        // Cell membrane
+        const breathe = 1 + Math.sin(time * 0.02 + x) * 0.05;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, rx * breathe, ry * breathe, 0, 0, Math.PI * 2);
+        ctx.fillStyle = color + '15';
+        ctx.strokeStyle = color + '40';
+        ctx.lineWidth = 1;
+        ctx.fill();
+        ctx.stroke();
+
+        // Nucleus
+        ctx.beginPath();
+        ctx.arc(0, 0, Math.min(rx, ry) * 0.3, 0, Math.PI * 2);
+        ctx.fillStyle = color + '25';
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    let frame = 0;
+    function render() {
+        if (!isActive) return;
+        requestAnimationFrame(render);
+        frame++;
+        ctx.clearRect(0, 0, w, h);
+
+        // Map progress to cell count (exponential feeling)
+        let count;
+        if (cellProgress < 0.05) count = 1;
+        else if (cellProgress < 0.15) count = 2;
+        else if (cellProgress < 0.3) count = 4;
+        else if (cellProgress < 0.5) count = 8;
+        else if (cellProgress < 0.7) count = 12;
+        else if (cellProgress < 0.85) count = 16;
+        else if (cellProgress < 0.95) count = 20;
+        else count = 22;
+
+        cellNumber.textContent = count;
+
+        // Only recompute positions when count changes (prevents random jitter)
+        if (count !== cachedCount) {
+            cachedCount = count;
+            cachedCells = getCellPositions(count, w, h);
+        }
+
+        cachedCells.forEach(cell => {
+            drawCell(cell.x, cell.y, cell.rx, cell.ry, cell.color, frame, 0);
+        });
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    ScrollTrigger.create({
+        trigger: '#cellSection',
+        start: 'top top',
+        end: '+=150%',
+        pin: true,
+        anticipatePin: 1,
+        scrub: 1,
+        onUpdate: (self) => { cellProgress = self.progress; },
+        onEnter: () => {
+            isActive = true;
+            const el = document.getElementById('cellSection');
+            el.style.visibility = 'visible';
+            gsap.to(el, { opacity: 1, duration: 0.8, ease: 'power2.out' });
+            render();
+        },
+        onLeave: () => { isActive = false; },
+        onEnterBack: () => {
+            isActive = true;
+            const el = document.getElementById('cellSection');
+            el.style.visibility = 'visible';
+            gsap.set(el, { opacity: 1 });
+            render();
+        },
+        onLeaveBack: () => {
+            isActive = false;
+            const el = document.getElementById('cellSection');
+            gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => {
+                el.style.visibility = 'hidden';
+            }});
+        }
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 5. GPA — FUNCTION PLOT (SCROLL-SCRUBBED)
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('gpaCanvas');
+    const reveal = document.getElementById('gpaReveal');
+    let ctx, w, h;
+    let plotProgress = 0;
+    let isActive = false;
+
+    function resize() {
+        const r = setupCanvas(canvas);
+        ctx = r.ctx; w = r.w; h = r.h;
+    }
+
+    // f(x) = 4 * (1 - e^(-3x))
+    function gpaFn(x) { return 4 * (1 - Math.exp(-3 * x)); }
+    // f'(x) = 12 * e^(-3x)
+    function gpaPrime(x) { return 12 * Math.exp(-3 * x); }
+
+    function render() {
+        if (!isActive) return;
+        requestAnimationFrame(render);
+        ctx.clearRect(0, 0, w, h);
+
+        const pad = { left: 60, right: 30, top: 30, bottom: 50 };
+        const gw = w - pad.left - pad.right;
+        const gh = h - pad.top - pad.bottom;
+
+        // Grid
+        ctx.strokeStyle = 'rgba(201, 169, 110, 0.06)';
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i <= 8; i++) {
+            const y = pad.top + (gh / 8) * i;
+            ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + gw, y); ctx.stroke();
+        }
+        for (let i = 0; i <= 10; i++) {
+            const x = pad.left + (gw / 10) * i;
+            ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + gh); ctx.stroke();
+        }
+
+        // Axes
+        ctx.strokeStyle = 'rgba(201, 169, 110, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad.left, pad.top); ctx.lineTo(pad.left, pad.top + gh); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(pad.left, pad.top + gh); ctx.lineTo(pad.left + gw, pad.top + gh); ctx.stroke();
+
+        // Y-axis labels
+        ctx.font = "10px 'Space Mono', monospace";
+        ctx.fillStyle = 'rgba(201, 169, 110, 0.4)';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        for (let v = 0; v <= 4; v++) {
+            const y = pad.top + gh - (v / 4.5) * gh;
+            ctx.fillText(v.toFixed(1), pad.left - 8, y);
+        }
+
+        // X-axis label
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText('time →', pad.left + gw / 2, pad.top + gh + 20);
+
+        // 4.0 perfection line (dashed)
+        const y40 = pad.top + gh - (4.0 / 4.5) * gh;
+        ctx.setLineDash([6, 4]);
+        ctx.strokeStyle = 'rgba(201, 169, 110, 0.25)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad.left, y40); ctx.lineTo(pad.left + gw, y40); ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Label the line
+        ctx.fillStyle = 'rgba(201, 169, 110, 0.3)';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('perfection', pad.left + gw - 60, y40 - 4);
+
+        // Draw main function curve up to plotProgress
+        const steps = Math.floor(plotProgress * 200);
+        if (steps > 1) {
+            // Main curve
+            ctx.beginPath();
+            for (let i = 0; i <= steps; i++) {
+                const t = i / 200;
+                const xVal = t * 2;
+                const yVal = gpaFn(xVal);
+                const px = pad.left + t * gw;
+                const py = pad.top + gh - (yVal / 4.5) * gh;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.strokeStyle = 'rgba(201, 169, 110, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Derivative curve (smaller, lighter)
+            ctx.beginPath();
+            for (let i = 0; i <= steps; i++) {
+                const t = i / 200;
+                const xVal = t * 2;
+                const yVal = gpaPrime(xVal) / 3; // Scale down
+                const px = pad.left + t * gw;
+                const py = pad.top + gh - (yVal / 4.5) * gh;
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.strokeStyle = 'rgba(232, 213, 168, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Dot at end of main curve
+            const lastT = steps / 200;
+            const lastX = lastT * 2;
+            const lastY = gpaFn(lastX);
+            const dotPx = pad.left + lastT * gw;
+            const dotPy = pad.top + gh - (lastY / 4.5) * gh;
+            ctx.beginPath();
+            ctx.arc(dotPx, dotPy, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#c9a96e';
+            ctx.fill();
+
+            // Glow
+            ctx.beginPath();
+            ctx.arc(dotPx, dotPy, 10, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(201, 169, 110, 0.15)';
+            ctx.fill();
+
+            // f'(x) label
+            if (plotProgress > 0.3) {
+                ctx.font = "9px 'Space Mono', monospace";
+                ctx.fillStyle = 'rgba(232, 213, 168, 0.4)';
+                ctx.textAlign = 'left';
+                ctx.fillText("f'(x) — always positive", pad.left + gw * 0.55, pad.top + gh - 20);
+            }
+        }
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    // Defer creation — must run after brain's deferred trigger creates its
+    // 500% pin spacer, otherwise this section's position is calculated too high.
+    requestAnimationFrame(() => {
+        ScrollTrigger.create({
+            trigger: '#gpaSection',
+            start: 'top top',
+            end: '+=150%',
+            pin: true,
+            scrub: 1,
+            onUpdate: (self) => {
+                plotProgress = self.progress;
+                if (self.progress > 0.85) {
+                    reveal.classList.add('visible');
+                } else {
+                    reveal.classList.remove('visible');
+                }
+            },
+            onEnter: () => {
+                isActive = true;
+                const el = document.getElementById('gpaSection');
+                el.style.visibility = 'visible';
+                gsap.to(el, { opacity: 1, duration: 0.8, ease: 'power2.out' });
+                render();
+            },
+            onLeave: () => { isActive = false; },
+            onEnterBack: () => {
+                isActive = true;
+                const el = document.getElementById('gpaSection');
+                el.style.visibility = 'visible';
+                gsap.set(el, { opacity: 1 });
+                render();
+            },
+            onLeaveBack: () => {
+                isActive = false;
+                const el = document.getElementById('gpaSection');
+                gsap.to(el, { opacity: 0, duration: 0.3, onComplete: () => {
+                    el.style.visibility = 'hidden';
+                }});
+            }
+        });
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 6. GOLDEN SPIRAL — FUTURE
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('spiralCanvas');
+    let ctx, w, h;
+    let spiralProgress = 0;
+    let isActive = false;
+    let frame = 0;
+
+    function resize() {
+        const r = setupCanvas(canvas);
+        ctx = r.ctx; w = r.w; h = r.h;
+    }
+
+    function render() {
+        if (!isActive) return;
+        requestAnimationFrame(render);
+        frame++;
+        ctx.clearRect(0, 0, w, h);
+
+        const cx = w / 2;
+        const cy = h / 2;
+        const phi = (1 + Math.sqrt(5)) / 2;
+        const maxAngle = spiralProgress * Math.PI * 8;
+        const maxR = Math.min(w, h) * 0.42;
+
+        // Draw spiral
+        if (maxAngle > 0.1) {
+            ctx.beginPath();
+            const totalSteps = 500;
+            const drawSteps = Math.floor(spiralProgress * totalSteps);
+            for (let i = 0; i <= drawSteps; i++) {
+                const t = i / totalSteps;
+                const angle = t * Math.PI * 8;
+                const r = maxR * Math.pow(phi, (angle / (2 * Math.PI)) - 3);
+                const clampR = Math.min(r, maxR);
+                const x = cx + Math.cos(angle + frame * 0.002) * clampR;
+                const y = cy + Math.sin(angle + frame * 0.002) * clampR;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = 'rgba(201, 169, 110, 0.3)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // Achievement dots along the spiral
+            const achievements = [0.1, 0.25, 0.4, 0.55, 0.7, 0.85];
+            achievements.forEach(at => {
+                if (spiralProgress > at) {
+                    const angle = at * Math.PI * 8;
+                    const r = maxR * Math.pow(phi, (angle / (2 * Math.PI)) - 3);
+                    const clampR = Math.min(r, maxR);
+                    const x = cx + Math.cos(angle + frame * 0.002) * clampR;
+                    const y = cy + Math.sin(angle + frame * 0.002) * clampR;
+                    const alpha = Math.min(1, (spiralProgress - at) * 5);
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(201, 169, 110, ${alpha * 0.6})`;
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.arc(x, y, 8, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(201, 169, 110, ${alpha * 0.1})`;
+                    ctx.fill();
+                }
+            });
+        }
+
+        // Fibonacci rectangles (subtle, in background)
+        if (spiralProgress > 0.1) {
+            ctx.strokeStyle = 'rgba(201, 169, 110, 0.04)';
+            ctx.lineWidth = 0.5;
+            const fibs = [1, 1, 2, 3, 5, 8];
+            let scale = maxR * 0.03;
+            let ox = cx, oy = cy;
+            fibs.forEach((f, i) => {
+                if (spiralProgress > i * 0.15) {
+                    const size = f * scale;
+                    ctx.strokeRect(ox - size / 2, oy - size / 2, size, size);
+                }
+            });
+        }
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    requestAnimationFrame(() => {
+    ScrollTrigger.create({
+        trigger: '#spiralSection',
+        start: 'top 80%',
+        end: 'bottom 20%',
+        scrub: 1,
+        onUpdate: (self) => { spiralProgress = self.progress; },
+        onEnter: () => { isActive = true; render(); },
+        onLeave: () => { isActive = false; },
+        onEnterBack: () => { isActive = true; render(); },
+        onLeaveBack: () => { isActive = false; }
+    });
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 7. BOBA — FLOATING PEARLS + INTERACTIVE
+// ═══════════════════════════════════════════════════════
+(function() {
+    // Floating particles
+    const container = document.getElementById('bobaParticles');
+    for (let i = 0; i < 12; i++) {
+        const pearl = document.createElement('div');
+        pearl.classList.add('pearl');
+        const size = Math.random() * 6 + 3;
+        pearl.style.width = size + 'px';
+        pearl.style.height = size + 'px';
+        pearl.style.left = (20 + Math.random() * 60) + '%';
+        pearl.style.top = (30 + Math.random() * 50) + '%';
+        pearl.style.setProperty('--duration', (4 + Math.random() * 4) + 's');
+        pearl.style.setProperty('--delay', (Math.random() * 3) + 's');
+        container.appendChild(pearl);
+    }
+
+    // Interactive pearls - bounce on click
+    document.querySelectorAll('.boba-pearl-interactive').forEach(pearl => {
+        pearl.addEventListener('click', () => {
+            gsap.fromTo(pearl,
+                { attr: { r: parseFloat(pearl.getAttribute('r')) } },
+                {
+                    attr: { r: parseFloat(pearl.getAttribute('r')) * 1.5 },
+                    duration: 0.15,
+                    yoyo: true,
+                    repeat: 3,
+                    ease: 'elastic.out(1, 0.3)'
+                }
+            );
+        });
+
+        pearl.style.cursor = 'pointer';
+        pearl.style.pointerEvents = 'auto';
+    });
+})();
+
+// ═══════════════════════════════════════════════════════
+// 8. FINALE — SYNAPSE LIGHTNING
+// ═══════════════════════════════════════════════════════
+(function() {
+    const canvas = document.getElementById('synapseCanvas');
+    let ctx, w, h;
+    let isActive = false;
+    let hasFired = false;
+    let time = 0;
+
+    const nodes = [];
+    const edges = [];
+    const nodeCount = 50;
+    let litNodes = new Set();
+    let litEdges = new Set();
+    let fireQueue = [];
+    let fireTimer = 0;
+    let statIndex = 0;
+
+    function generate() {
+        nodes.length = 0;
+        edges.length = 0;
+        for (let i = 0; i < nodeCount; i++) {
+            nodes.push({
+                x: Math.random() * w,
+                y: Math.random() * h,
+                r: 2 + Math.random() * 2,
+                lit: false,
+                litTime: 0
+            });
+        }
+        // Connect nearby nodes
+        for (let i = 0; i < nodes.length; i++) {
+            for (let j = i + 1; j < nodes.length; j++) {
+                const dist = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
+                const threshold = Math.min(w, h) * 0.18;
+                if (dist < threshold) {
+                    edges.push({ a: i, b: j, lit: false });
+                }
+            }
+        }
+    }
+
+    function resize() {
+        const r = setupCanvas(canvas);
+        ctx = r.ctx; w = r.w; h = r.h;
+        generate();
+    }
+
+    function startFiring() {
+        if (hasFired) return;
+        hasFired = true;
+        litNodes.clear();
+        litEdges.clear();
+        statIndex = 0;
+
+        // Start from center-ish node
+        let bestIdx = 0, bestDist = Infinity;
+        nodes.forEach((n, i) => {
+            const d = Math.hypot(n.x - w / 2, n.y - h / 2);
+            if (d < bestDist) { bestDist = d; bestIdx = i; }
+        });
+
+        fireQueue = [{ nodeIdx: bestIdx, delay: 0 }];
+    }
+
+    function render() {
+        if (!isActive) return;
+        requestAnimationFrame(render);
+        time++;
+        ctx.clearRect(0, 0, w, h);
+
+        // Process fire queue
+        if (fireQueue.length > 0) {
+            fireTimer++;
+            if (fireTimer % 3 === 0) {
+                const batch = [];
+                const next = fireQueue.shift();
+                if (next && !litNodes.has(next.nodeIdx)) {
+                    litNodes.add(next.nodeIdx);
+                    nodes[next.nodeIdx].lit = true;
+                    nodes[next.nodeIdx].litTime = time;
+
+                    // Find connected unlit nodes
+                    edges.forEach((edge, ei) => {
+                        if (edge.a === next.nodeIdx || edge.b === next.nodeIdx) {
+                            litEdges.add(ei);
+                            edge.lit = true;
+                            const other = edge.a === next.nodeIdx ? edge.b : edge.a;
+                            if (!litNodes.has(other)) {
+                                fireQueue.push({ nodeIdx: other, delay: 0 });
+                            }
+                        }
+                    });
+
+                    // Reveal stats
+                    const litRatio = litNodes.size / nodes.length;
+                    const stats = document.querySelectorAll('.synapse-stat');
+                    if (litRatio > 0.2 && statIndex < 1) { stats[0].classList.add('revealed'); statIndex = 1; }
+                    if (litRatio > 0.4 && statIndex < 2) { stats[1].classList.add('revealed'); statIndex = 2; }
+                    if (litRatio > 0.6 && statIndex < 3) { stats[2].classList.add('revealed'); statIndex = 3; }
+                    if (litRatio > 0.8 && statIndex < 4) { stats[3].classList.add('revealed'); statIndex = 4; }
+                }
+            }
+        }
+
+        // Draw edges
+        edges.forEach((edge, i) => {
+            const a = nodes[edge.a];
+            const b = nodes[edge.b];
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            if (edge.lit) {
+                const age = (time - Math.max(a.litTime || 0, b.litTime || 0));
+                const flash = Math.max(0, 1 - age / 60);
+                ctx.strokeStyle = `rgba(201, 169, 110, ${0.15 + flash * 0.4})`;
+                ctx.lineWidth = 0.8 + flash;
+            } else {
+                ctx.strokeStyle = 'rgba(201, 169, 110, 0.04)';
+                ctx.lineWidth = 0.5;
+            }
+            ctx.stroke();
+        });
+
+        // Draw nodes
+        nodes.forEach(node => {
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
+            if (node.lit) {
+                const age = (time - node.litTime);
+                const flash = Math.max(0, 1 - age / 40);
+                ctx.fillStyle = `rgba(201, 169, 110, ${0.3 + flash * 0.7})`;
+                // Glow
+                if (flash > 0) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, node.r + 6 + flash * 8, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(201, 169, 110, ${flash * 0.15})`;
+                    ctx.fill();
+                    ctx.restore();
+                    ctx.beginPath();
+                    ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(201, 169, 110, ${0.3 + flash * 0.7})`;
+                }
+            } else {
+                ctx.fillStyle = 'rgba(201, 169, 110, 0.08)';
+            }
+            ctx.fill();
+        });
+    }
+
+    resize();
+    window.addEventListener('resize', () => { resize(); hasFired = false; });
+
+    requestAnimationFrame(() => {
+    ScrollTrigger.create({
+        trigger: '#finaleSection',
+        start: 'top 60%',
+        onEnter: () => {
+            isActive = true;
+            startFiring();
+            render();
+        },
+        onLeave: () => { isActive = false; },
+        onEnterBack: () => {
+            isActive = true;
+            if (!hasFired) startFiring();
+            render();
+        },
+        onLeaveBack: () => { isActive = false; }
+    });
+    });
+})();
+</script>
+</body>
+</html>
+{% endverbatim %}

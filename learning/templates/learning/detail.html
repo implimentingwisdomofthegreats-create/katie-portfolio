@@ -1,0 +1,90 @@
+{% extends "base_learning.html" %}
+{% block title %}{{ subject.name }} — Learn Any Topic{% endblock %}
+
+{% block content %}
+<div class="app-container">
+    <a href="{% url 'dashboard' %}" class="back-btn">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M12 4L6 10L12 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back
+    </a>
+
+    <div class="screen-header">
+        <h1 class="screen-title">{{ subject.name }}</h1>
+        <form method="post" action="{% url 'delete_subject' subject.pk %}" style="position:absolute;right:0;">
+            {% csrf_token %}
+            <button type="submit" class="delete-btn" title="Delete subject" onclick="return confirm('Delete this subject and all its topics?');">&times;</button>
+        </form>
+    </div>
+
+    {% if subject.goals %}
+    <p style="text-align:center;color:var(--gray-500);font-size:14px;margin-top:-28px;margin-bottom:24px;">{{ subject.goals }}</p>
+    {% endif %}
+
+    {% if topics %}
+    <div class="topics-list">
+        {% for topic in topics %}
+        <div class="topic-card">
+            <div>
+                <div class="topic-card-title">{{ topic.name }}</div>
+                {% if topic.notes %}
+                <div class="topic-card-notes">{{ topic.notes }}</div>
+                {% endif %}
+            </div>
+            <form method="post" action="{% url 'delete_topic' subject.pk topic.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="delete-btn" title="Delete topic" onclick="return confirm('Delete this topic?');">&times;</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="empty-state" style="margin-top:60px;">No topics yet. Tap + to add one.</p>
+    {% endif %}
+</div>
+
+<!-- FAB -->
+<div class="fab-wrapper">
+    <span class="fab-label">Add a topic</span>
+    <button class="fab" id="fabBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+    </button>
+</div>
+
+<!-- Add Topic Modal -->
+<div class="modal-overlay" id="modal">
+    <div class="modal">
+        <h2 class="modal-title">Add a topic</h2>
+        <form method="post" action="{% url 'add_topic' subject.pk %}">
+            {% csrf_token %}
+            {{ topic_form.name }}
+            {{ topic_form.notes }}
+            <button type="submit" class="modal-btn">Add</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const fab = document.getElementById('fabBtn');
+    const modal = document.getElementById('modal');
+
+    fab.addEventListener('click', () => {
+        modal.classList.add('active');
+        modal.querySelector('input').focus();
+    });
+
+    modal.addEventListener('click', e => {
+        if (e.target === modal) modal.classList.remove('active');
+    });
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') modal.classList.remove('active');
+    });
+</script>
+{% endblock %}
