@@ -932,6 +932,145 @@
         /* boba formula/aside removed */
 
         /* ═══════════════════════════════════════════════
+           LEARN WITH KATIE
+           ═══════════════════════════════════════════════ */
+        .learn-section {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 120px 24px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .learn-particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .learn-particle {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--warm);
+            opacity: 0;
+            animation: learnFloat var(--dur, 8s) var(--delay, 0s) infinite ease-in-out;
+        }
+
+        @keyframes learnFloat {
+            0%   { opacity: 0; transform: translateY(0) scale(0.5); }
+            15%  { opacity: var(--peak, 0.25); }
+            85%  { opacity: var(--peak, 0.25); }
+            100% { opacity: 0; transform: translateY(-180px) scale(1); }
+        }
+
+        .learn-title {
+            font-family: 'Instrument Serif', serif;
+            font-size: clamp(2.2rem, 5vw, 3.5rem);
+            font-weight: 400;
+            color: var(--warm);
+            position: relative;
+            z-index: 1;
+        }
+
+        .learn-body {
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 300;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--off-white);
+            max-width: 480px;
+            margin: 24px auto 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .learn-cta-wrap {
+            position: relative;
+            margin-top: 48px;
+            z-index: 1;
+        }
+
+        .learn-cta {
+            display: inline-block;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 500;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: var(--black);
+            background: var(--warm);
+            padding: 14px 40px;
+            border-radius: 100px;
+            text-decoration: none;
+            position: relative;
+            z-index: 2;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .learn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(201, 169, 110, 0.35);
+        }
+
+        .learn-cta-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 110%;
+            height: 160%;
+            border: 1px solid var(--warm);
+            border-radius: 100px;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            animation: ctaPulse 2.4s ease-in-out infinite;
+        }
+
+        .learn-cta-ring:nth-child(2) {
+            animation-delay: 0.8s;
+        }
+
+        .learn-cta-ring:nth-child(3) {
+            animation-delay: 1.6s;
+        }
+
+        @keyframes ctaPulse {
+            0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            30%  { opacity: 0.35; }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
+        }
+
+        .learn-orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        .orbit-dot {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: var(--warm);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            animation: orbitSpin var(--orbit-dur, 6s) linear infinite;
+        }
+
+        @keyframes orbitSpin {
+            from { transform: rotate(0deg) translateX(90px) rotate(0deg); opacity: 0.4; }
+            50%  { opacity: 0.15; }
+            to   { transform: rotate(360deg) translateX(90px) rotate(-360deg); opacity: 0.4; }
+        }
+
+        /* ═══════════════════════════════════════════════
            FINALE — SYNAPSE LIGHTNING
            ═══════════════════════════════════════════════ */
         .finale {
@@ -1082,6 +1221,8 @@
             .start-stats { gap: 16px; }
             .start-stat { padding: 20px 12px; }
             .boba-section { padding: 80px 20px; }
+            .learn-section { padding: 80px 20px; }
+            .learn-orbit { width: 160px; height: 160px; }
             .finale { padding: 60px 20px; }
             .finale-sub { font-size: 0.9rem; }
 
@@ -1460,6 +1601,32 @@
     <p class="boba-text fade-element delay-1">
         And after conquering all of that?<br>She just wants boba.
     </p>
+</section>
+
+<div class="spacer"></div>
+
+<!-- ═══════════ LEARN WITH KATIE ═══════════ -->
+<section class="learn-section" id="learnSection">
+    <div class="learn-particles" id="learnParticles"></div>
+
+    <span class="label fade-element">The platform</span>
+    <div class="divider fade-element delay-1"></div>
+    <h2 class="learn-title fade-element delay-2">Learn with Katie</h2>
+    <p class="learn-body fade-element delay-3">
+        After mastering 22 credit hours, crossing 9,146 miles, and earning a 4.0 — Katie distilled every scientifically&#8209;backed study method she used into one platform. Active recall, spaced repetition, elaborative interrogation&nbsp;&mdash; the techniques that got her here are now yours.
+    </p>
+
+    <div class="learn-cta-wrap fade-element delay-4">
+        <span class="learn-cta-ring"></span>
+        <span class="learn-cta-ring"></span>
+        <span class="learn-cta-ring"></span>
+        <div class="learn-orbit">
+            <span class="orbit-dot" style="--orbit-dur:5s;"></span>
+            <span class="orbit-dot" style="--orbit-dur:7s; animation-delay:-3s;"></span>
+            <span class="orbit-dot" style="--orbit-dur:9s; animation-delay:-5s;"></span>
+        </div>
+        <a href="/app/register/" class="learn-cta">Start learning</a>
+    </div>
 </section>
 
 <div class="spacer"></div>
@@ -2595,6 +2762,26 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
 })();
 
 // ═══════════════════════════════════════════════════════
+// 7b. LEARN WITH KATIE — FLOATING PARTICLES
+// ═══════════════════════════════════════════════════════
+(function() {
+    const container = document.getElementById('learnParticles');
+    for (let i = 0; i < 15; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('learn-particle');
+        const size = Math.random() * 5 + 2;
+        dot.style.width = size + 'px';
+        dot.style.height = size + 'px';
+        dot.style.left = (10 + Math.random() * 80) + '%';
+        dot.style.top = (20 + Math.random() * 70) + '%';
+        dot.style.setProperty('--dur', (6 + Math.random() * 6) + 's');
+        dot.style.setProperty('--delay', (Math.random() * 5) + 's');
+        dot.style.setProperty('--peak', (0.1 + Math.random() * 0.2).toFixed(2));
+        container.appendChild(dot);
+    }
+})();
+
+// ═══════════════════════════════════════════════════════
 // 8. FINALE — SYNAPSE LIGHTNING
 // ═══════════════════════════════════════════════════════
 (function() {
@@ -2769,6 +2956,7 @@ document.querySelectorAll('.fade-element').forEach(el => fadeObserver.observe(el
     });
 })();
 </script>
+<script src="/static/coach-katie.js"></script>
 </body>
 </html>
 {% endverbatim %}
