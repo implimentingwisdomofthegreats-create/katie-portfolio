@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katie. — Learn Any Topic</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap');
+
+        :root {
+            --black: #000000;
+            --white: #ffffff;
+            --gray-100: #f2f2f2;
+            --gray-200: #d9d9d9;
+            --gray-300: #d5d5d5;
+            --gray-400: #d7d7d7;
+            --gray-500: #8a8a8a;
+            --shadow: rgba(0, 0, 0, 0.25);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--white);
+            color: var(--black);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* ═══════════════════════════════════════════════
+           SCREENS
+           ═══════════════════════════════════════════════ */
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 575px;
+            min-height: 100vh;
+            position: relative;
+            padding: 44px 40px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ═══════════════════════════════════════════════
+           LOGIN SCREEN
+           ═══════════════════════════════════════════════ */
+        .login-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px;
+            max-width: 439px;
+            margin: 0 auto;
+        }
+
+        .login-screen.active {
+            display: flex;
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .login-subtitle {
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .login-input {
+            width: 259px;
+            height: 44px;
+            background: var(--gray-200);
+            border: none;
+            border-radius: 20px;
+            padding: 0 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            margin-bottom: 26px;
+            outline: none;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .login-input::placeholder {
+            color: var(--gray-500);
+            font-style: italic;
+        }
+
+        .login-input:focus {
+            box-shadow: 0 0 0 2px var(--black);
+        }
+
+        .login-btn {
+            width: 259px;
+            height: 44px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .login-btn:hover {
+            opacity: 0.85;
+        }
+
+        /* ═══════════════════════════════════════════════
+           DASHBOARD (MY SUBJECTS)
+           ═══════════════════════════════════════════════ */
+        .screen-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 0 16px;
+        }
+
+        .subject-card {
+            background: var(--gray-400);
+            border-radius: 7px;
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .subject-card-name {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 16px;
+            margin-top: 80px;
+        }
+
+        /* ═══════════════════════════════════════════════
+           FAB (ADD BUTTON)
+           ═══════════════════════════════════════════════ */
+        .fab-wrapper {
+            position: fixed;
+            bottom: 40px;
+            right: calc(50% - 287px + 40px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .fab-label {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .fab {
+            width: 65px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--black);
+            background: var(--white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .fab:hover {
+            background: var(--gray-100);
+            transform: scale(1.05);
+        }
+
+        .fab svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        /* ═══════════════════════════════════════════════
+           MODAL
+           ═══════════════════════════════════════════════ */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            animation: fadeInOverlay 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: var(--gray-300);
+            width: 328px;
+            padding: 19px 29px 24px;
+            box-shadow: 0 4px 4px var(--shadow);
+            animation: slideUp 0.25s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .modal-input {
+            width: 270px;
+            height: 51px;
+            background: var(--gray-100);
+            border: 1px solid var(--black);
+            border-radius: 18px;
+            padding: 0 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            outline: none;
+            margin-bottom: 7px;
+            display: block;
+        }
+
+        .modal-input::placeholder {
+            color: var(--gray-500);
+            font-style: italic;
+            font-size: 20px;
+        }
+
+        .modal-textarea {
+            width: 270px;
+            height: 140px;
+            background: var(--gray-100);
+            border: 1px solid var(--black);
+            border-radius: 18px;
+            padding: 14px 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            outline: none;
+            resize: none;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .modal-textarea::placeholder {
+            color: var(--gray-500);
+            font-style: italic;
+            font-size: 20px;
+        }
+
+        .modal-btn {
+            width: 270px;
+            height: 44px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: 18px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+            display: block;
+        }
+
+        .modal-btn:hover {
+            opacity: 0.85;
+        }
+
+        /* ═══════════════════════════════════════════════
+           SUBJECT DETAIL
+           ═══════════════════════════════════════════════ */
+        .back-btn {
+            position: absolute;
+            top: 44px;
+            left: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--black);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity 0.2s ease;
+        }
+
+        .back-btn:hover {
+            opacity: 0.6;
+        }
+
+        .topics-list {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 0 16px;
+        }
+
+        .topic-card {
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+
+        .topic-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .topic-card-goals {
+            font-size: 14px;
+            color: var(--gray-500);
+        }
+
+        .detail-empty {
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 16px;
+            margin-top: 80px;
+        }
+
+        /* ═══════════════════════════════════════════════
+           RESPONSIVE
+           ═══════════════════════════════════════════════ */
+        @media (max-width: 620px) {
+            .fab-wrapper {
+                right: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .screen {
+                padding: 44px 20px;
+            }
+
+            .subjects-grid {
+                padding: 0;
+                gap: 14px;
+            }
+
+            .subject-card {
+                height: 110px;
+            }
+
+            .subject-card-name {
+                font-size: 20px;
+            }
+
+            .modal {
+                width: calc(100vw - 40px);
+                max-width: 328px;
+            }
+
+            .modal-input,
+            .modal-textarea,
+            .modal-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════════════
+         SCREEN 1: LOGIN
+         ═══════════════════════════════════════════════ -->
+    <div id="loginScreen" class="login-screen active">
+        <h1 class="login-title">Learn any topic</h1>
+        <p class="login-subtitle">Create account</p>
+        <input type="text" class="login-input" id="nameInput" placeholder="Your name">
+        <input type="email" class="login-input" id="emailInput" placeholder="Email">
+        <button class="login-btn" id="loginBtn">Get started</button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         SCREEN 2: MY SUBJECTS (DASHBOARD)
+         ═══════════════════════════════════════════════ -->
+    <div id="dashboardScreen" class="screen">
+        <h1 class="screen-title">My subjects</h1>
+        <div class="subjects-grid" id="subjectsGrid"></div>
+        <p class="empty-state" id="emptyState">No subjects yet. Tap + to add one.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         SCREEN 3: SUBJECT DETAIL
+         ═══════════════════════════════════════════════ -->
+    <div id="detailScreen" class="screen">
+        <button class="back-btn" id="backBtn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M12 4L6 10L12 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Back
+        </button>
+        <h1 class="screen-title" id="detailTitle"></h1>
+        <div class="topics-list" id="topicsList"></div>
+        <p class="detail-empty" id="detailEmpty">No topics yet. Tap + to add one.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         FAB (FLOATING ACTION BUTTON)
+         ═══════════════════════════════════════════════ -->
+    <div class="fab-wrapper" id="fabWrapper" style="display:none;">
+        <span class="fab-label" id="fabLabel">Add a topic</span>
+        <button class="fab" id="fabBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         MODAL: ADD SUBJECT
+         ═══════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="subjectModal">
+        <div class="modal">
+            <h2 class="modal-title">Add a subject</h2>
+            <input type="text" class="modal-input" id="subjectNameInput" placeholder="Subject name">
+            <textarea class="modal-textarea" id="subjectGoalsInput" placeholder="Learning goals (optional)"></textarea>
+            <button class="modal-btn" id="addSubjectBtn">Add</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         MODAL: ADD TOPIC
+         ═══════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="topicModal">
+        <div class="modal">
+            <h2 class="modal-title">Add a topic</h2>
+            <input type="text" class="modal-input" id="topicNameInput" placeholder="Topic name">
+            <textarea class="modal-textarea" id="topicGoalsInput" placeholder="Notes (optional)"></textarea>
+            <button class="modal-btn" id="addTopicBtn">Add</button>
+        </div>
+    </div>
+
+    <script>
+        /* ═══════════════════════════════════════════════
+           STATE
+           ═══════════════════════════════════════════════ */
+        const state = {
+            user: null,
+            subjects: [],
+            currentSubject: null,
+            currentScreen: 'login'
+        };
+
+        /* ═══════════════════════════════════════════════
+           DOM REFS
+           ═══════════════════════════════════════════════ */
+        const $ = id => document.getElementById(id);
+
+        const loginScreen    = $('loginScreen');
+        const dashboardScreen = $('dashboardScreen');
+        const detailScreen   = $('detailScreen');
+        const subjectsGrid   = $('subjectsGrid');
+        const emptyState     = $('emptyState');
+        const detailTitle    = $('detailTitle');
+        const topicsList     = $('topicsList');
+        const detailEmpty    = $('detailEmpty');
+        const fabWrapper     = $('fabWrapper');
+        const fabLabel       = $('fabLabel');
+        const subjectModal   = $('subjectModal');
+        const topicModal     = $('topicModal');
+
+        /* ═══════════════════════════════════════════════
+           NAVIGATION
+           ═══════════════════════════════════════════════ */
+        function showScreen(name) {
+            state.currentScreen = name;
+
+            loginScreen.classList.remove('active');
+            dashboardScreen.classList.remove('active');
+            detailScreen.classList.remove('active');
+
+            if (name === 'login') {
+                loginScreen.classList.add('active');
+                fabWrapper.style.display = 'none';
+            } else if (name === 'dashboard') {
+                dashboardScreen.classList.add('active');
+                fabWrapper.style.display = 'flex';
+                fabLabel.textContent = 'Add a topic';
+                renderSubjects();
+            } else if (name === 'detail') {
+                detailScreen.classList.add('active');
+                fabWrapper.style.display = 'flex';
+                fabLabel.textContent = 'Add a topic';
+                renderTopics();
+            }
+        }
+
+        /* ═══════════════════════════════════════════════
+           RENDER SUBJECTS GRID
+           ═══════════════════════════════════════════════ */
+        function renderSubjects() {
+            subjectsGrid.innerHTML = '';
+
+            if (state.subjects.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            state.subjects.forEach((subject, i) => {
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+                card.innerHTML = `<span class="subject-card-name">${subject.name}</span>`;
+                card.addEventListener('click', () => {
+                    state.currentSubject = i;
+                    showScreen('detail');
+                });
+                subjectsGrid.appendChild(card);
+            });
+        }
+
+        /* ═══════════════════════════════════════════════
+           RENDER TOPICS LIST
+           ═══════════════════════════════════════════════ */
+        function renderTopics() {
+            const subject = state.subjects[state.currentSubject];
+            detailTitle.textContent = subject.name;
+            topicsList.innerHTML = '';
+
+            if (!subject.topics || subject.topics.length === 0) {
+                detailEmpty.style.display = 'block';
+                return;
+            }
+
+            detailEmpty.style.display = 'none';
+
+            subject.topics.forEach(topic => {
+                const card = document.createElement('div');
+                card.className = 'topic-card';
+                card.innerHTML = `
+                    <div class="topic-card-title">${topic.name}</div>
+                    ${topic.notes ? `<div class="topic-card-goals">${topic.notes}</div>` : ''}
+                `;
+                topicsList.appendChild(card);
+            });
+        }
+
+        /* ═══════════════════════════════════════════════
+           PERSISTENCE (localStorage)
+           ═══════════════════════════════════════════════ */
+        function save() {
+            localStorage.setItem('katie-app-data', JSON.stringify(state.subjects));
+        }
+
+        function load() {
+            const data = localStorage.getItem('katie-app-data');
+            if (data) {
+                state.subjects = JSON.parse(data);
+            }
+        }
+
+        /* ═══════════════════════════════════════════════
+           EVENT HANDLERS
+           ═══════════════════════════════════════════════ */
+
+        // Login
+        $('loginBtn').addEventListener('click', () => {
+            const name = $('nameInput').value.trim();
+            if (!name) {
+                $('nameInput').focus();
+                return;
+            }
+            state.user = name;
+            showScreen('dashboard');
+        });
+
+        $('nameInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') $('emailInput').focus();
+        });
+
+        $('emailInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') $('loginBtn').click();
+        });
+
+        // FAB
+        $('fabBtn').addEventListener('click', () => {
+            if (state.currentScreen === 'dashboard') {
+                subjectModal.classList.add('active');
+                $('subjectNameInput').value = '';
+                $('subjectGoalsInput').value = '';
+                setTimeout(() => $('subjectNameInput').focus(), 100);
+            } else if (state.currentScreen === 'detail') {
+                topicModal.classList.add('active');
+                $('topicNameInput').value = '';
+                $('topicGoalsInput').value = '';
+                setTimeout(() => $('topicNameInput').focus(), 100);
+            }
+        });
+
+        // Add Subject
+        $('addSubjectBtn').addEventListener('click', () => {
+            const name = $('subjectNameInput').value.trim();
+            if (!name) {
+                $('subjectNameInput').focus();
+                return;
+            }
+            state.subjects.push({
+                name: name,
+                goals: $('subjectGoalsInput').value.trim(),
+                topics: []
+            });
+            save();
+            subjectModal.classList.remove('active');
+            renderSubjects();
+        });
+
+        // Add Topic
+        $('addTopicBtn').addEventListener('click', () => {
+            const name = $('topicNameInput').value.trim();
+            if (!name) {
+                $('topicNameInput').focus();
+                return;
+            }
+            const subject = state.subjects[state.currentSubject];
+            if (!subject.topics) subject.topics = [];
+            subject.topics.push({
+                name: name,
+                notes: $('topicGoalsInput').value.trim()
+            });
+            save();
+            topicModal.classList.remove('active');
+            renderTopics();
+        });
+
+        // Back button
+        $('backBtn').addEventListener('click', () => {
+            state.currentSubject = null;
+            showScreen('dashboard');
+        });
+
+        // Close modals on overlay click
+        subjectModal.addEventListener('click', e => {
+            if (e.target === subjectModal) subjectModal.classList.remove('active');
+        });
+
+        topicModal.addEventListener('click', e => {
+            if (e.target === topicModal) topicModal.classList.remove('active');
+        });
+
+        // Close modals on Escape
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                subjectModal.classList.remove('active');
+                topicModal.classList.remove('active');
+            }
+        });
+
+        // Enter to submit in modals
+        $('subjectNameInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') $('subjectGoalsInput').focus();
+        });
+
+        $('topicNameInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter') $('topicGoalsInput').focus();
+        });
+
+        /* ═══════════════════════════════════════════════
+           INIT
+           ═══════════════════════════════════════════════ */
+        load();
+        showScreen('login');
+    </script>
+</body>
+</html>
