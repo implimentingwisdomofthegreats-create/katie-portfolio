@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   COACH KATIE — Interactive dancing biologist mascot
-   Drop this script into any page to add Coach Katie.
+   COACH KATIE — Clean chibi bio student mascot
    ═══════════════════════════════════════════════════════ */
 (function () {
     const tips = [
@@ -14,11 +13,10 @@
         "Elaborative interrogation: always ask yourself WHY.",
         "Dual coding — pair words with visuals for deeper learning.",
         "Retrieval practice > re-reading. Test yourself often!",
-        "You're doing amazing. Keep going! 🧬",
+        "You're doing amazing. Keep going!",
         "Science says handwriting notes beats typing for retention!",
     ];
 
-    // Inject styles
     const style = document.createElement("style");
     style.textContent = `
         .coach-katie {
@@ -29,41 +27,35 @@
             cursor: pointer;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        .coach-katie-figure {
-            width: 72px;
-            height: 96px;
-            animation: coachBounce 1.6s ease-in-out infinite;
-            transform-origin: bottom center;
-            filter: drop-shadow(0 2px 8px rgba(201,169,110,0.15));
-            transition: filter 0.2s ease;
+        .coach-katie:hover {
+            transform: scale(1.08);
         }
 
         .coach-katie:hover .coach-katie-figure {
-            filter: drop-shadow(0 4px 16px rgba(201,169,110,0.35));
-            animation-duration: 0.8s;
+            filter: drop-shadow(0 3px 10px rgba(0,0,0,0.18));
         }
 
-        .kawaii-sparkle {
-            animation: sparkle 1.8s ease-in-out infinite;
+        .coach-katie:hover .katie-wave {
+            animation: katieWave 0.6s ease-in-out 2;
+            transform-origin: 14px 58px;
         }
 
-        .kawaii-sparkle:nth-child(2) { animation-delay: 0.6s; }
-        .kawaii-sparkle:nth-child(3) { animation-delay: 1.2s; }
-
-        @keyframes sparkle {
-            0%, 100% { opacity: 0; transform: scale(0.5); }
-            50% { opacity: 1; transform: scale(1.1); }
+        .coach-katie.pop {
+            transform: scale(1.35);
         }
 
-        .kawaii-eye-shine {
-            animation: eyeShine 3s ease-in-out infinite;
+        .coach-katie.pop .coach-katie-figure {
+            filter: drop-shadow(0 6px 20px rgba(201,169,110,0.35));
         }
 
-        @keyframes eyeShine {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
+        .coach-katie-figure {
+            width: 56px;
+            height: 72px;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.12));
+            transition: filter 0.3s ease;
         }
 
         .coach-katie-label {
@@ -72,26 +64,24 @@
             font-weight: 600;
             letter-spacing: 0.5px;
             text-align: center;
-            margin-top: 4px;
-            opacity: 0.7;
+            margin-top: 2px;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
         }
 
-        /* Adapt label color to page background */
-        body[style*="background: #000"] .coach-katie-label,
-        body[style*="background:#000"] .coach-katie-label {
-            color: #ccc;
+        .coach-katie:hover .coach-katie-label {
+            opacity: 1;
         }
 
-        @keyframes coachBounce {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25%  { transform: translateY(-6px) rotate(2deg); }
-            50%  { transform: translateY(0) rotate(0deg); }
-            75%  { transform: translateY(-4px) rotate(-2deg); }
+        @keyframes katieWave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-12deg); }
+            75% { transform: rotate(8deg); }
         }
 
         .coach-bubble {
             position: fixed;
-            top: 124px;
+            top: 100px;
             right: 16px;
             z-index: 9997;
             background: #1a1a1a;
@@ -119,7 +109,7 @@
             content: '';
             position: absolute;
             top: -6px;
-            right: 28px;
+            right: 24px;
             width: 12px;
             height: 12px;
             background: #1a1a1a;
@@ -127,7 +117,6 @@
             border-radius: 2px;
         }
 
-        /* Light page variant */
         .page-light .coach-bubble {
             background: #ffffff;
             color: #111111;
@@ -146,11 +135,11 @@
 
         @media (max-width: 480px) {
             .coach-katie-figure {
-                width: 54px;
-                height: 72px;
+                width: 44px;
+                height: 56px;
             }
             .coach-bubble {
-                top: 100px;
+                top: 84px;
                 right: 12px;
                 max-width: 200px;
                 font-size: 12px;
@@ -166,161 +155,91 @@
     `;
     document.head.appendChild(style);
 
-    // Detect light vs dark page
+    // Detect page background
     const bg = getComputedStyle(document.body).backgroundColor;
     const isLight =
         bg === "rgb(255, 255, 255)" ||
         bg === "rgba(0, 0, 0, 0)" ||
         document.body.style.background === "#ffffff" ||
-        document.body.style.background === "white" ||
-        document.querySelector('meta[name="theme-color"][content="#ffffff"]');
-
+        document.body.style.background === "white";
     if (isLight) document.body.classList.add("page-light");
 
-    // Build character
     const wrapper = document.createElement("div");
     wrapper.className = "coach-katie";
     wrapper.setAttribute("role", "button");
     wrapper.setAttribute("aria-label", "Coach Katie — click for a study tip");
     wrapper.innerHTML = `
-        <svg class="coach-katie-figure" viewBox="0 0 72 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Sparkles -->
-            <g class="kawaii-sparkle" transform="translate(6, 8)">
-                <path d="M0 3 L3 0 L6 3 L3 6Z" fill="#c9a96e" opacity="0.7"/>
-            </g>
-            <g class="kawaii-sparkle" transform="translate(60, 14)">
-                <path d="M0 2.5 L2.5 0 L5 2.5 L2.5 5Z" fill="#c9a96e" opacity="0.6"/>
-            </g>
-            <g class="kawaii-sparkle" transform="translate(10, 32)">
-                <path d="M0 2 L2 0 L4 2 L2 4Z" fill="#c9a96e" opacity="0.5"/>
-            </g>
+        <svg class="coach-katie-figure" viewBox="0 0 56 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- BIG HEAD -->
+            <!-- Hair back -->
+            <ellipse cx="28" cy="17" rx="17" ry="17" fill="#1a1a1a"/>
 
-            <!-- Hair (back — long flowing) -->
-            <ellipse cx="36" cy="22" rx="19" ry="19" fill="#1a1a1a"/>
-            <!-- Long hair flowing down behind body -->
-            <path d="M17 22 Q14 40 16 62 Q18 70 22 72 L22 42 Q20 30 17 22Z" fill="#1a1a1a"/>
-            <path d="M55 22 Q58 40 56 62 Q54 70 50 72 L50 42 Q52 30 55 22Z" fill="#1a1a1a"/>
-            <!-- Hair sheen -->
-            <path d="M22 12 Q28 8 34 12" stroke="#333" stroke-width="0.8" fill="none" opacity="0.4"/>
-            <path d="M38 10 Q44 7 50 12" stroke="#333" stroke-width="0.8" fill="none" opacity="0.4"/>
+            <!-- Face (big round chibi head) -->
+            <ellipse cx="28" cy="19" rx="14" ry="15" fill="#f5deb3"/>
 
-            <!-- Bun (cute messy top bun) -->
-            <circle cx="46" cy="7" r="8" fill="#1a1a1a"/>
-            <circle cx="46" cy="7" r="6" fill="#222"/>
-            <!-- Cute flower hair clip -->
-            <g transform="translate(39, 0)">
-                <circle cx="4" cy="4" r="2" fill="#ffb6c1"/>
-                <circle cx="4" cy="0.5" r="1.8" fill="#ffc0cb"/>
-                <circle cx="7" cy="2.5" r="1.8" fill="#ffc0cb"/>
-                <circle cx="6.5" cy="5.8" r="1.8" fill="#ffc0cb"/>
-                <circle cx="1.5" cy="5.8" r="1.8" fill="#ffc0cb"/>
-                <circle cx="1" cy="2.5" r="1.8" fill="#ffc0cb"/>
-                <circle cx="4" cy="4" r="1.3" fill="#c9a96e"/>
-            </g>
+            <!-- Hair front — thick straight bangs -->
+            <path d="M14 14 L14 11 Q18 4 28 3 Q38 4 42 11 L42 14 Q38 10 28 9 Q18 10 14 14Z" fill="#1a1a1a"/>
+            <!-- Side hair -->
+            <path d="M14 14 Q13 20 14 28" stroke="#1a1a1a" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M42 14 Q43 20 42 28" stroke="#1a1a1a" stroke-width="4" fill="none" stroke-linecap="round"/>
 
-            <!-- Face (rounder, softer kawaii shape) -->
-            <ellipse cx="36" cy="24" rx="14" ry="15" fill="#fce4c8"/>
-            <!-- Chin highlight -->
-            <ellipse cx="36" cy="33" rx="5" ry="2" fill="#fdebd3" opacity="0.5"/>
+            <!-- BIG GLASSES -->
+            <circle cx="22" cy="20" r="7" fill="none" stroke="#444" stroke-width="1.2"/>
+            <circle cx="34" cy="20" r="7" fill="none" stroke="#444" stroke-width="1.2"/>
+            <!-- Bridge -->
+            <line x1="29" y1="19" x2="27" y2="19" stroke="#444" stroke-width="1.2"/>
+            <!-- Arms of glasses -->
+            <line x1="15" y1="18.5" x2="12" y2="17" stroke="#444" stroke-width="1" stroke-linecap="round"/>
+            <line x1="41" y1="18.5" x2="44" y2="17" stroke="#444" stroke-width="1" stroke-linecap="round"/>
+            <!-- Lens shine -->
+            <path d="M17 16 Q18 15 19 16" stroke="#fff" stroke-width="0.6" fill="none" opacity="0.5" stroke-linecap="round"/>
+            <path d="M29 16 Q30 15 31 16" stroke="#fff" stroke-width="0.6" fill="none" opacity="0.5" stroke-linecap="round"/>
 
-            <!-- Blush (bigger, more kawaii) -->
-            <ellipse cx="24" cy="29" rx="4" ry="2.2" fill="#ffaaaa" opacity="0.35"/>
-            <ellipse cx="48" cy="29" rx="4" ry="2.2" fill="#ffaaaa" opacity="0.35"/>
+            <!-- Eyes (simple dots behind glasses) -->
+            <circle cx="22" cy="20.5" r="2" fill="#1a1a1a"/>
+            <circle cx="34" cy="20.5" r="2" fill="#1a1a1a"/>
+            <!-- Eye highlights -->
+            <circle cx="22.8" cy="19.8" r="0.7" fill="#fff"/>
+            <circle cx="34.8" cy="19.8" r="0.7" fill="#fff"/>
 
-            <!-- Kawaii eyes — big and sparkly -->
-            <!-- Left eye -->
-            <ellipse cx="29" cy="24" rx="4" ry="5" fill="#2c1810"/>
-            <ellipse cx="29" cy="24.5" rx="3.5" ry="4.2" fill="#1a1a1a"/>
-            <circle cx="30.5" cy="22.5" r="1.8" fill="#fff" class="kawaii-eye-shine"/>
-            <circle cx="27.5" cy="25" r="1" fill="#fff" opacity="0.7"/>
-            <ellipse cx="29" cy="22" rx="1.2" ry="0.5" fill="#fff" opacity="0.3"/>
-            <!-- Left eye lashes -->
-            <path d="M25 20 Q24 18 23 17.5" stroke="#1a1a1a" stroke-width="0.8" stroke-linecap="round" fill="none"/>
-            <path d="M26 19.5 Q25.5 17.5 25 16.5" stroke="#1a1a1a" stroke-width="0.8" stroke-linecap="round" fill="none"/>
-            <path d="M28 19 Q28 17 28.5 16" stroke="#1a1a1a" stroke-width="0.7" stroke-linecap="round" fill="none"/>
+            <!-- Subtle blush -->
+            <ellipse cx="17" cy="24" rx="2.5" ry="1.2" fill="#f0a0a0" opacity="0.25"/>
+            <ellipse cx="39" cy="24" rx="2.5" ry="1.2" fill="#f0a0a0" opacity="0.25"/>
 
-            <!-- Right eye -->
-            <ellipse cx="43" cy="24" rx="4" ry="5" fill="#2c1810"/>
-            <ellipse cx="43" cy="24.5" rx="3.5" ry="4.2" fill="#1a1a1a"/>
-            <circle cx="44.5" cy="22.5" r="1.8" fill="#fff" class="kawaii-eye-shine"/>
-            <circle cx="41.5" cy="25" r="1" fill="#fff" opacity="0.7"/>
-            <ellipse cx="43" cy="22" rx="1.2" ry="0.5" fill="#fff" opacity="0.3"/>
-            <!-- Right eye lashes -->
-            <path d="M47 20 Q48 18 49 17.5" stroke="#1a1a1a" stroke-width="0.8" stroke-linecap="round" fill="none"/>
-            <path d="M46 19.5 Q46.5 17.5 47 16.5" stroke="#1a1a1a" stroke-width="0.8" stroke-linecap="round" fill="none"/>
-            <path d="M44 19 Q44 17 43.5 16" stroke="#1a1a1a" stroke-width="0.7" stroke-linecap="round" fill="none"/>
-
-            <!-- Cute round glasses -->
-            <circle cx="29" cy="24" r="6" fill="none" stroke="#c9a96e" stroke-width="0.8" opacity="0.7"/>
-            <circle cx="43" cy="24" r="6" fill="none" stroke="#c9a96e" stroke-width="0.8" opacity="0.7"/>
-            <line x1="35" y1="24" x2="37" y2="24" stroke="#c9a96e" stroke-width="0.8" opacity="0.7"/>
-            <line x1="23" y1="23" x2="20" y2="22" stroke="#c9a96e" stroke-width="0.6" opacity="0.5"/>
-            <line x1="49" y1="23" x2="52" y2="22" stroke="#c9a96e" stroke-width="0.6" opacity="0.5"/>
-
-            <!-- Cute little nose -->
-            <path d="M35 27.5 Q36 28.5 37 27.5" stroke="#ddb896" stroke-width="0.6" fill="none" stroke-linecap="round"/>
-
-            <!-- Kawaii cat-smile -->
-            <path d="M31 31.5 Q33 30 36 32 Q39 30 41 31.5" stroke="#d4837a" stroke-width="0.9" fill="none" stroke-linecap="round"/>
-
-            <!-- Cute front bangs (wispy, face-framing) -->
-            <path d="M22 18 Q26 6 36 9 Q30 14 22 18Z" fill="#1a1a1a"/>
-            <path d="M36 9 Q46 6 50 18 Q44 14 36 9Z" fill="#1a1a1a"/>
-            <!-- Side wisps -->
-            <path d="M21 20 Q19 24 20 30" stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <path d="M51 20 Q53 24 52 30" stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <!-- Small smile -->
+            <path d="M25 26 Q28 28.5 31 26" stroke="#c48a6a" stroke-width="0.8" fill="none" stroke-linecap="round"/>
 
             <!-- Neck -->
-            <rect x="33" y="38" width="6" height="4" rx="2" fill="#fce4c8"/>
+            <rect x="25.5" y="33" width="5" height="3" rx="1" fill="#f5deb3"/>
 
-            <!-- Lab coat (cuter, slightly A-line) -->
-            <path d="M22 42 L17 82 L55 82 L50 42 Q42 40 36 40 Q30 40 22 42Z" fill="#f5f5f5" stroke="#e8e8e8" stroke-width="0.5"/>
-            <!-- Coat collar -->
-            <path d="M28 42 L32 46 L36 42 L40 46 L44 42" fill="none" stroke="#e0e0e0" stroke-width="0.8"/>
-            <!-- Cute bow at collar -->
-            <path d="M33 44 Q36 42 36 44 Q36 42 39 44" fill="#ffb6c1" stroke="#f4a0ab" stroke-width="0.4"/>
-            <circle cx="36" cy="43.5" r="1" fill="#ffb6c1"/>
-            <!-- Coat buttons (heart-shaped) -->
-            <path d="M35 54 Q36 52.5 37 54 Q36 55.5 35 54Z" fill="#ffb6c1" opacity="0.6"/>
-            <path d="M35 60 Q36 58.5 37 60 Q36 61.5 35 60Z" fill="#ffb6c1" opacity="0.6"/>
-            <!-- Pocket with little flower -->
-            <rect x="40" y="54" width="7" height="8" rx="2" fill="none" stroke="#ddd" stroke-width="0.5"/>
-            <circle cx="43.5" cy="53" r="1.5" fill="#ffb6c1" opacity="0.5"/>
+            <!-- SMALL BODY — lab coat -->
+            <path d="M17 36 L14 62 L42 62 L39 36 Q34 35 28 35 Q22 35 17 36Z" fill="#f0f0f0" stroke="#e0e0e0" stroke-width="0.5"/>
+            <!-- Collar -->
+            <path d="M23 36 L28 40 L33 36" fill="none" stroke="#ddd" stroke-width="0.8"/>
+            <!-- Buttons -->
+            <circle cx="28" cy="44" r="0.8" fill="#ccc"/>
+            <circle cx="28" cy="48" r="0.8" fill="#ccc"/>
+            <!-- Pocket -->
+            <rect x="31" y="43" width="5" height="6" rx="1" fill="none" stroke="#ddd" stroke-width="0.5"/>
+            <!-- Pen -->
+            <line x1="33.5" y1="41" x2="33.5" y2="45" stroke="#c9a96e" stroke-width="0.8" stroke-linecap="round"/>
 
-            <!-- Arms -->
-            <path d="M22 44 L13 62 L17 64 L24 50" fill="#f5f5f5" stroke="#e8e8e8" stroke-width="0.5"/>
-            <path d="M50 44 L59 62 L55 64 L48 50" fill="#f5f5f5" stroke="#e8e8e8" stroke-width="0.5"/>
-            <!-- Hands -->
-            <ellipse cx="15" cy="63.5" rx="3.8" ry="3.2" fill="#fce4c8"/>
-            <ellipse cx="57" cy="63.5" rx="3.8" ry="3.2" fill="#fce4c8"/>
+            <!-- Right arm (static) -->
+            <path d="M39 37 L46 50 L43 52 L38 42" fill="#f0f0f0" stroke="#e0e0e0" stroke-width="0.5"/>
+            <ellipse cx="44.5" cy="51.5" rx="2.5" ry="2" fill="#f5deb3"/>
 
-            <!-- Book in left hand (cuter, pastel) -->
-            <rect x="8" y="60" width="11" height="7" rx="1.5" fill="#c9a96e" opacity="0.8"/>
-            <line x1="13.5" y1="60" x2="13.5" y2="67" stroke="#b5941f" stroke-width="0.5"/>
-            <path d="M9 62 L12 62" stroke="#fff" stroke-width="0.4" opacity="0.5"/>
-            <path d="M9 63.5 L11 63.5" stroke="#fff" stroke-width="0.4" opacity="0.5"/>
-
-            <!-- Test tube in right hand -->
-            <g transform="translate(54, 55) rotate(15)">
-                <rect x="0" y="0" width="4" height="12" rx="2" fill="none" stroke="#4ecdc4" stroke-width="0.8" opacity="0.7"/>
-                <rect x="0.5" y="6" width="3" height="5.5" rx="1.5" fill="#4ecdc4" opacity="0.3"/>
-                <rect x="-0.5" y="-1" width="5" height="2" rx="0.5" fill="#ddd" opacity="0.6"/>
-                <!-- Bubbles -->
-                <circle cx="2" cy="7.5" r="0.6" fill="#fff" opacity="0.5"/>
-                <circle cx="1.2" cy="9" r="0.4" fill="#fff" opacity="0.4"/>
+            <!-- Left arm (waves on hover) -->
+            <g class="katie-wave">
+                <path d="M17 37 L10 50 L13 52 L18 42" fill="#f0f0f0" stroke="#e0e0e0" stroke-width="0.5"/>
+                <ellipse cx="11.5" cy="51.5" rx="2.5" ry="2" fill="#f5deb3"/>
+                <!-- Book -->
+                <rect x="5" y="49" width="8" height="5.5" rx="1" fill="#c9a96e" opacity="0.75"/>
+                <line x1="9" y1="49" x2="9" y2="54.5" stroke="#b08a3e" stroke-width="0.4"/>
             </g>
 
-            <!-- Tiny floating hearts -->
-            <g opacity="0.4">
-                <path d="M8 50 Q9 48.5 10 50 Q9 51.5 8 50Z" fill="#ffb6c1">
-                    <animate attributeName="opacity" values="0.4;0.1;0.4" dur="2.5s" repeatCount="indefinite"/>
-                    <animateTransform attributeName="transform" type="translate" values="0,0;-1,-3;0,0" dur="2.5s" repeatCount="indefinite"/>
-                </path>
-                <path d="M60 48 Q61 46.5 62 48 Q61 49.5 60 48Z" fill="#ffb6c1">
-                    <animate attributeName="opacity" values="0.3;0.1;0.3" dur="3s" begin="0.8s" repeatCount="indefinite"/>
-                    <animateTransform attributeName="transform" type="translate" values="0,0;1,-4;0,0" dur="3s" begin="0.8s" repeatCount="indefinite"/>
-                </path>
-            </g>
+            <!-- Feet -->
+            <ellipse cx="22" cy="63" rx="4" ry="1.5" fill="#444"/>
+            <ellipse cx="34" cy="63" rx="4" ry="1.5" fill="#444"/>
         </svg>
         <div class="coach-katie-label">Coach Katie</div>
     `;
@@ -347,8 +266,16 @@
         isOpen = false;
     }
 
+    // Click: pop scale + show/hide tip
     wrapper.addEventListener("click", function (e) {
         e.stopPropagation();
+
+        // Pop animation
+        wrapper.classList.add("pop");
+        setTimeout(function () {
+            wrapper.classList.remove("pop");
+        }, 400);
+
         if (isOpen) {
             hideTip();
         } else {
